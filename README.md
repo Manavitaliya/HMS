@@ -1,7 +1,7 @@
-# HMS
-Django based Hostel Management System.
+# Hostel Management System
+This project is Django based **Hostel Management System**. This project uses **SQLite3** as the database backend.
 
-
+---
 
 ## Project Installation and Setup
 
