@@ -10,8 +10,8 @@ Django based Hostel Management System.
        
 2. **Create and activate virtual environment**
 
-        python -m venv CRUD
-        CRUD\Scripts\activate
+        python -m venv myvenvv
+        myvenvv\Scripts\activate
 3. **Install dependencies**
 
         pip install django
