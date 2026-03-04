@@ -55,7 +55,7 @@ class Monitor(models.Model):
 class StudentProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     hostel = models.ForeignKey(Hostel, on_delete=models.SET_NULL, null=True, blank=True)
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True)
+    room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True, blank=True)
     is_approved = models.BooleanField(default=False)
 
     def __str__(self):
@@ -67,6 +67,13 @@ class StudentProfile(models.Model):
 class StudentApplication(models.Model):
     student = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     preferred_hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
+    assigned_hostel = models.ForeignKey(
+        Hostel,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_students'
+    )
     status = models.CharField(max_length=20, default='PENDING')
 
     def __str__(self):

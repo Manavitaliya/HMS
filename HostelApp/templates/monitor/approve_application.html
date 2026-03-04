@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>Approve Application</h3>
+
+<p><strong>Student:</strong> {{ application.student.username }}</p>
+<p><strong>Preferred Hostel:</strong> {{ application.preferred_hostel.name }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Select Hostel to Assign:</label>
+    <select name="hostel_id" class="form-control">
+        {% for data in hostel_data %}
+        <option value="{{ data.hostel.id }}">
+            {{ data.hostel.name }}
+            (Available Beds: {{ data.available }})
+        </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-success mt-2">Approve & Assign Hostel</button>
+</form>
+
+{% endblock %}

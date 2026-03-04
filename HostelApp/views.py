@@ -314,16 +314,55 @@ def approve_application(request, id):
         return redirect('login')
 
     application = StudentApplication.objects.get(id=id)
-    application.status = 'APPROVED'
-    application.save()
+    hostels = Hostel.objects.all()
 
-    profile = StudentProfile.objects.get(user=application.student)
-    profile.is_approved = True
-    profile.hostel = application.preferred_hostel
-    profile.save()
+    hostel_data = []
 
-    messages.success(request, "Application Approved Successfully")
-    return redirect('view_applications')
+    for hostel in hostels:
+        rooms = Room.objects.filter(hostel=hostel)
+
+        total_capacity = sum(room.capacity for room in rooms)
+        total_occupied = sum(room.occupied for room in rooms)
+        available = total_capacity - total_occupied
+
+        hostel_data.append({
+            'hostel': hostel,
+            'total_capacity': total_capacity,
+            'occupied': total_occupied,
+            'available': available
+        })
+
+    if request.method == 'POST':
+        hostel_id = request.POST.get('hostel_id')
+        selected_hostel = Hostel.objects.get(id=hostel_id)
+
+        # Update application
+        application.status = 'APPROVED'
+        application.assigned_hostel = selected_hostel
+        application.save()
+
+        rooms = Room.objects.filter(hostel=selected_hostel)
+        total_capacity = sum(room.capacity for room in rooms)
+        total_occupied = sum(room.occupied for room in rooms)
+
+        if total_occupied >= total_capacity:
+            messages.error(request, "Hostel is Full")
+            return redirect('view_applications')
+        
+        # Update student profile
+        profile = StudentProfile.objects.get(user=application.student)
+        profile.is_approved = True
+        profile.hostel = selected_hostel
+        profile.save()
+
+        messages.success(request, "Hostel Assigned & Application Approved")
+        return redirect('view_applications')
+
+    return render(request, 'monitor/approve_application.html', {
+        'application': application,
+        'hostel_data': hostel_data
+
+    })
 
 
 # ----------------------REJECT APPLICATION (MONITOR)-------------------------------
@@ -341,4 +380,4 @@ def reject_application(request, id):
     return redirect('view_applications')
 
 
-# ------------------------------------------------------------
+# -----------------------monitor assign room-------------------------------------
