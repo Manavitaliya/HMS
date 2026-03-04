@@ -123,3 +123,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'HostelApp.User'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'redirect_dashboard'
+LOGOUT_REDIRECT_URL = 'login'
+
+TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']

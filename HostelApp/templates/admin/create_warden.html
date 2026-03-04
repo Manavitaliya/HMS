@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow">
+    <div class="card-header bg-dark text-white">
+        <h4>Create Warden</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label>Username</label>
+                {{ form.username }}
+            </div>
+
+            <div class="mb-3">
+                <label>Password</label>
+                {{ form.password }}
+            </div>
+
+            <button class="btn btn-success">Create Warden</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

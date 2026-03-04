@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5>Hostels</h5>
+                <a href="{% url 'create_hostel' %}" class="btn btn-dark mt-2">Create Hostel</a>
+                <a href="{% url 'view_hostels' %}" class="btn btn-outline-dark mt-2">View Hostels</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5>Monitors</h5>
+                <a href="{% url 'create_monitor' %}" class="btn btn-dark mt-2">Create Monitor</a>
+                <a href="{% url 'view_monitors' %}" class="btn btn-outline-dark mt-2">View Monitors</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5>Wardens</h5>
+                <a href="{% url 'create_warden' %}" class="btn btn-dark mt-2">Create Warden</a>
+                <a href="{% url 'view_wardens' %}" class="btn btn-outline-dark mt-2">View Wardens</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow">
+    <div class="card-header bg-dark text-white">
+        <h4>Create Hostel</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label>Hostel Name</label>
+                {{ form.name }}
+            </div>
+
+            <div class="mb-3">
+                <label>Total Rooms</label>
+                {{ form.total_rooms }}
+            </div>
+
+            <div class="mb-3">
+                <label>Monthly Fee</label>
+                {{ form.monthly_fee }}
+            </div>
+
+            <button class="btn btn-success">Create Hostel</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

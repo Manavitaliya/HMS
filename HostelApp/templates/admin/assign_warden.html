@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow">
+    <div class="card-header bg-dark text-white">
+        <h4>Assign Warden to Hostel</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Select Warden</label>
+                {{ form.user }}
+            </div>
+
+            <div class="mb-3">
+                <label>Select Hostel</label>
+                {{ form.hostel }}
+            </div>
+
+            <button class="btn btn-success">Assign</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
