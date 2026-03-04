@@ -1,5 +1,5 @@
 from django import forms
-from .models import Hostel, User, Warden, Monitor
+from .models import *
 
 
 # ---------------- HOSTEL FORM ----------------
@@ -34,3 +34,21 @@ class MonitorForm(forms.ModelForm):
     class Meta:
         model = Monitor
         fields = ['user']
+        
+
+# ---------------- STUDENT REGISTRATION FORM ----------------
+
+class StudentRegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+
+# ---------------- APPLICATION FORM ----------------
+
+class StudentApplicationForm(forms.ModelForm):
+    class Meta:
+        model = StudentApplication
+        fields = ['preferred_hostel']

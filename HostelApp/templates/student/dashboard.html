@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Student Dashboard</h2>
-<p>Welcome {{ request.user.username }}</p>
+<hr>
+
+<a href="{% url 'student_view_hostels' %}" 
+   class="btn btn-primary mt-2">View Hostels</a>
+
+<a href="{% url 'apply_hostel' %}" 
+   class="btn btn-success mt-2">Apply For Hostel</a>
+
+<a href="{% url 'logout' %}" 
+   class="btn btn-danger mt-2">Logout</a>
 {% endblock %}

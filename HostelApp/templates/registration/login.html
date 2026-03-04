@@ -9,6 +9,12 @@
     <button type="submit">Login</button>
 </form>
 
+<hr>
+<p>New Student?</p>
+<a href="{% url 'student_register' %}" class="btn btn-outline-primary">
+    Register Here
+</a>
+
 {% if error %}
 <p style="color:red;">{{ error }}</p>
 {% endif %}

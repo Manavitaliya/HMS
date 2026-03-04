@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>Available Hostels</h3>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Total Rooms</th>
+            <th>Monthly Fee</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hostel in hostels %}
+        <tr>
+            <td>{{ hostel.name }}</td>
+            <td>{{ hostel.total_rooms }}</td>
+            <td>{{ hostel.monthly_fee }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

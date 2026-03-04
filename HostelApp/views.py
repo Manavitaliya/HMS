@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import User
 
-from .models import Hostel, Warden, Monitor
-from .forms import HostelForm, UserForm, WardenForm, MonitorForm
+from .models import *
+from .forms import *
 from django.contrib import messages
 
 
@@ -221,4 +221,124 @@ def delete_warden(request, id):
     return redirect('view_wardens')
 
 
-# -------------------------------------------------------
+# -----------------STUDENT DASHBOARD-----------------------------------
+
+
+@login_required
+def student_dashboard(request):
+    if request.user.role != 'STUDENT':
+        return redirect('login')
+
+    return render(request, 'student/dashboard.html')
+
+# ---------------- STUDENT REGISTER ----------------
+
+def student_register(request):
+    form = StudentRegisterForm(request.POST or None)
+
+    if form.is_valid():
+        user = form.save(commit=False)
+        user.role = 'STUDENT'
+        user.set_password(user.password)
+        user.save()
+
+        StudentProfile.objects.create(user=user)
+
+        messages.success(request, "Registration Successful. Please Login.")
+        return redirect('login')
+
+    return render(request, 'student/register.html', {'form': form})
+
+
+# ---------------- VIEW HOSTELS (STUDENT) ----------------
+
+@login_required
+def student_view_hostels(request):
+    if request.user.role != 'STUDENT':
+        return redirect('login')
+
+    hostels = Hostel.objects.all()
+    return render(request, 'student/view_hostels.html', {'hostels': hostels})
+
+
+# ---------------- APPLY FOR HOSTEL ----------------
+
+@login_required
+def apply_hostel(request):
+    if request.user.role != 'STUDENT':
+        return redirect('login')
+
+    if StudentApplication.objects.filter(student=request.user).exists():
+        messages.error(request, "You already applied.")
+        return redirect('student_dashboard')
+
+    form = StudentApplicationForm(request.POST or None)
+
+    if form.is_valid():
+        application = form.save(commit=False)
+        application.student = request.user
+        application.save()
+        messages.success(request, "Application Submitted Successfully")
+        return redirect('student_dashboard')
+
+    return render(request, 'student/apply_hostel.html', {'form': form})
+
+
+# ----------------------MONITOR DASHBOARD------------------------------------
+
+@login_required
+def monitor_dashboard(request):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    return render(request, 'monitor/dashboard.html')
+
+
+# ---------------------VIEW APPLICATION (MONITIR)--------------------------
+
+@login_required
+def view_applications(request):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    applications = StudentApplication.objects.filter(status='PENDING')
+    return render(request, 'monitor/view_applications.html', {'applications': applications})
+
+
+# ---------------------------APPROVE APPLICATION (MONITOR)---------------------------------
+
+
+@login_required
+def approve_application(request, id):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    application = StudentApplication.objects.get(id=id)
+    application.status = 'APPROVED'
+    application.save()
+
+    profile = StudentProfile.objects.get(user=application.student)
+    profile.is_approved = True
+    profile.hostel = application.preferred_hostel
+    profile.save()
+
+    messages.success(request, "Application Approved Successfully")
+    return redirect('view_applications')
+
+
+# ----------------------REJECT APPLICATION (MONITOR)-------------------------------
+
+@login_required
+def reject_application(request, id):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    application = StudentApplication.objects.get(id=id)
+    application.status = 'REJECTED'
+    application.save()
+
+    messages.error(request, "Application Rejected")
+    return redirect('view_applications')
+
+
+# ------------------------------------------------------------

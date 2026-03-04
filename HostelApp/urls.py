@@ -22,4 +22,16 @@ urlpatterns = [
     path('admin/view-wardens/', views.view_wardens, name='view_wardens'),
     path('admin/delete-monitor/<int:id>/', views.delete_monitor, name='delete_monitor'),
     path('admin/delete-warden/<int:id>/', views.delete_warden, name='delete_warden'),
+    
+    path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('student/register/', views.student_register, name='student_register'),
+    path('student/view-hostels/', views.student_view_hostels, name='student_view_hostels'),
+    path('student/apply/', views.apply_hostel, name='apply_hostel'),
+    
+    path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
+    path('monitor/applications/', views.view_applications, name='view_applications'),
+    path('monitor/approve/<int:id>/', views.approve_application, name='approve_application'),
+    path('monitor/reject/<int:id>/', views.reject_application, name='reject_application'),
+
+
 ]

@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Monitor Dashboard</h2>
-<p>Welcome {{ request.user.username }}</p>
+<hr>
+
+<a href="{% url 'view_applications' %}" 
+   class="btn btn-primary mt-2">View Applications</a>
+
+<a href="{% url 'logout' %}" 
+   class="btn btn-danger mt-2">Logout</a>
 {% endblock %}

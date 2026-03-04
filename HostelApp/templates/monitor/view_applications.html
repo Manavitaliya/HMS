@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>Pending Applications</h3>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Student</th>
+            <th>Preferred Hostel</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>{{ app.student.username }}</td>
+            <td>{{ app.preferred_hostel.name }}</td>
+            <td>
+                <a href="{% url 'approve_application' app.id %}" 
+                   class="btn btn-success btn-sm">Approve</a>
+
+                <a href="{% url 'reject_application' app.id %}" 
+                   class="btn btn-danger btn-sm">Reject</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No Pending Applications</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
