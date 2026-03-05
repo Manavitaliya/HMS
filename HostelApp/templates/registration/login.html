@@ -1,19 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Login Page</h2>
+
 
 <form method="POST">
     {% csrf_token %}
+    <h2>Login Here</h2><br><br>
     <input type="text" name="username" placeholder="Username" required><br><br>
     <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
+    <button class="btn btn-outline-primary">Login</button>
+
+    {% comment %} <p>New Student?</p> {% endcomment %}
+    <a href="{% url 'student_register' %}" class="btn btn-outline-primary">
+        Register Here
+    </a>
 </form>
 
-<hr>
-<p>New Student?</p>
-<a href="{% url 'student_register' %}" class="btn btn-outline-primary">
-    Register Here
-</a>
+
 
 {% if error %}
 <p style="color:red;">{{ error }}</p>

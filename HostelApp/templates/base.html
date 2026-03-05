@@ -8,14 +8,15 @@
 
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-        <span class="navbar-brand">Hostel Management System</span>
+        <a class="navbar-brand">Hostel Management System</span>
         {% if request.user.is_authenticated %}
+            <a href="{% url 'redirect_dashboard' %}" class="btn btn-primary" >Home</a>
             <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
         {% endif %}
     </div>
 </nav>
 
-<div class="container mt-4">
+<div class="container d-flex justify-content-center mt-5">
     {% block content %}{% endblock %}
 </div>
 
