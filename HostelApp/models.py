@@ -90,3 +90,17 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.hostel.name} - Room {self.room_number}"
+    
+    
+# ---------------------STUDENT REGESTRATION------------------------------
+
+class Stu_rege(models.model):
+    fname = models.CharField(max_length=100)
+    mname = models.CharField(max_length=100)
+    lname = models.CharField(max_length=100)
+    phone_no = models.DecimalField(max_digits=10)
+    
+    def __str__(self):
+        return f"{self.Stu_rege.fname} - {self.Stu_rege.lname}"
+    
+    

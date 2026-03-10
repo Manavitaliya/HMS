@@ -43,7 +43,7 @@ class StudentRegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['fname', 'mname','lname','phone_no', 'last_std', 'curr_std', 'sch_coll']
 
 
 # ---------------- APPLICATION FORM ----------------
