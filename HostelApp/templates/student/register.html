@@ -3,10 +3,31 @@
 
 <h3>Student Registration</h3>
 
-<form method="POST">
+<form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-dark">Register</button>
+
+    <h3>Account Info</h3>
+    {{ form.username }}<br>
+    {{ form.email }}<br>
+    {{ form.password }}<br>
+    {{ form.confirm_password }}<br>
+
+    <h3>Personal Info</h3>
+    {{ form.full_name }}<br>
+    {{ form.dob }}<br>
+    {{ form.gender }}<br>
+    {{ form.address }}<br>
+    {{ form.contact }}<br>
+
+    <h3>Academic Info</h3>
+    {{ form.course }}<br>
+    {{ form.college_name }}<br>
+    {{ form.college_year }}<br>
+
+    <h3>Hostel Preference</h3>
+    {{ form.preferred_hostel }}<br><br>
+
+    <button type="submit">Register</button>
 </form>
 
 {% endblock %}

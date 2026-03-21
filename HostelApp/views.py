@@ -231,23 +231,47 @@ def student_dashboard(request):
 
     return render(request, 'student/dashboard.html')
 
-# ---------------- STUDENT REGISTER ----------------
+# ---------------- STUDENT REGISTER ---------------------
 
 def student_register(request):
-    form = StudentRegisterForm(request.POST or None)
+    if request.method == 'POST':
+        form = StudentRegisterForm(request.POST)
 
-    if form.is_valid():
-        user = form.save(commit=False)
-        user.role = 'STUDENT'
-        user.set_password(user.password)
-        user.save()
+        if form.is_valid():
+            # Create User
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password'],
+                role='STUDENT'
+            )
 
-        StudentProfile.objects.create(user=user)
+            # Create Student Profile
+            profile = StudentProfile.objects.create(
+                user=user,
+                full_name=form.cleaned_data['full_name'],
+                dob=form.cleaned_data['dob'],
+                gender=form.cleaned_data['gender'],
+                address=form.cleaned_data['address'],
+                contact=form.cleaned_data['contact'],
+                course=form.cleaned_data['course'],
+                college_name=form.cleaned_data['college_name'],
+                college_year=form.cleaned_data['college_year']
+            )
 
-        messages.success(request, "Registration Successful. Please Login.")
-        return redirect('login')
+            # Create Hostel Application
+            StudentApplication.objects.create(
+                student=profile,  # (make sure you updated model)
+                preferred_hostel=form.cleaned_data['preferred_hostel']
+            )
 
-    return render(request, 'student/register.html', {'form': form})
+            messages.success(request, "Registration successful! Please login.")
+            return redirect('login')
+
+    else:
+        form = StudentRegisterForm()
+
+    return render(request, 'student_register.html', {'form': form})
 
 
 # ---------------- VIEW HOSTELS (STUDENT) ----------------
@@ -268,7 +292,9 @@ def apply_hostel(request):
     if request.user.role != 'STUDENT':
         return redirect('login')
 
-    if StudentApplication.objects.filter(student=request.user).exists():
+    profile = StudentProfile.objects.get(user=request.user)
+
+    if StudentApplication.objects.filter(student=profile).exists():
         messages.error(request, "You already applied.")
         return redirect('student_dashboard')
 
@@ -350,7 +376,7 @@ def approve_application(request, id):
             return redirect('view_applications')
         
         # Update student profile
-        profile = StudentProfile.objects.get(user=application.student)
+        profile = application.student
         profile.is_approved = True
         profile.hostel = selected_hostel
         profile.save()
