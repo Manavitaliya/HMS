@@ -3,11 +3,6 @@ from . import views
 
 urlpatterns = [
 
-    from django.urls import path
-from . import views
-
-urlpatterns = [
-
     path('', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('redirect/', views.redirect_dashboard, name='redirect_dashboard'),
@@ -39,4 +34,3 @@ urlpatterns = [
     path('warden/dashboard/', views.warden_dashboard, name='warden_dashboard'),
 ]
 
-]

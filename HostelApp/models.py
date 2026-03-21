@@ -85,7 +85,7 @@ class StudentProfile(models.Model):
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
-    contact = models.CharField(max_length=10, null=True, blank=True)
+    contact = models.CharField(max_length=10, null=True, blank=True, unique=True)
     course = models.CharField(max_length=100, null=True, blank=True)
     college_name = models.CharField(max_length=150, null=True, blank=True)
     college_year = models.CharField(max_length=10, choices=YEAR_CHOICES, null=True, blank=True)

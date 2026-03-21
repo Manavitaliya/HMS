@@ -2,7 +2,11 @@
 {% block content %}
 
 <h3>Student Registration</h3>
-
+{% if form.errors %}
+    <div style="color:red;">
+        {{ form.errors }}
+    </div>
+{% endif %}
 <form method="post">
     {% csrf_token %}
 

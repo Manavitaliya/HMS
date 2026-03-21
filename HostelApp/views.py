@@ -7,6 +7,8 @@ from .models import *
 from .forms import *
 from django.contrib import messages
 
+from django.shortcuts import get_object_or_404
+
 
 # ---------------- LOGIN ----------------
 
@@ -60,19 +62,11 @@ def admin_dashboard(request):
     return render(request, 'admin/dashboard.html')
 
 
-@login_required
-def monitor_dashboard(request):
-    return render(request, 'monitor/dashboard.html')
-
 
 @login_required
 def warden_dashboard(request):
     return render(request, 'warden/dashboard.html')
 
-
-@login_required
-def student_dashboard(request):
-    return render(request, 'student/dashboard.html')
 
 
 # ----------------------CREATE HOSTEL--------------------------------
@@ -153,7 +147,7 @@ def assign_warden(request, user_id):
     if request.user.role != 'ADMIN':
         return redirect('login')
 
-    user = User.objects.get(id=user_id)
+    user = get_object_or_404(User, id=user_id)
 
     # Only show hostels that don't have a warden yet
     available_hostels = Hostel.objects.filter(warden__isnull=True)
@@ -179,7 +173,7 @@ def view_monitors(request):
     if request.user.role != 'ADMIN':
         return redirect('login')
 
-    monitors = Monitor.objects.all()
+    monitor = get_object_or_404(Monitor, id=id)
     return render(request, 'admin/view_monitors.html', {'monitors': monitors})
 
 
@@ -229,6 +223,11 @@ def student_dashboard(request):
     if request.user.role != 'STUDENT':
         return redirect('login')
 
+    profile = StudentProfile.objects.get(user=request.user)
+
+    if not profile.is_approved:
+        return render(request, 'student/pending.html')
+
     return render(request, 'student/dashboard.html')
 
 # ---------------- STUDENT REGISTER ---------------------
@@ -271,7 +270,7 @@ def student_register(request):
     else:
         form = StudentRegisterForm()
 
-    return render(request, 'student_register.html', {'form': form})
+    return render(request, 'student/register.html', {'form': form})
 
 
 # ---------------- VIEW HOSTELS (STUDENT) ----------------
@@ -284,30 +283,6 @@ def student_view_hostels(request):
     hostels = Hostel.objects.all()
     return render(request, 'student/view_hostels.html', {'hostels': hostels})
 
-
-# ---------------- APPLY FOR HOSTEL ----------------
-
-@login_required
-def apply_hostel(request):
-    if request.user.role != 'STUDENT':
-        return redirect('login')
-
-    profile = StudentProfile.objects.get(user=request.user)
-
-    if StudentApplication.objects.filter(student=profile).exists():
-        messages.error(request, "You already applied.")
-        return redirect('student_dashboard')
-
-    form = StudentApplicationForm(request.POST or None)
-
-    if form.is_valid():
-        application = form.save(commit=False)
-        application.student = request.user
-        application.save()
-        messages.success(request, "Application Submitted Successfully")
-        return redirect('student_dashboard')
-
-    return render(request, 'student/apply_hostel.html', {'form': form})
 
 
 # ----------------------MONITOR DASHBOARD------------------------------------
@@ -339,7 +314,7 @@ def approve_application(request, id):
     if request.user.role != 'MONITOR':
         return redirect('login')
 
-    application = StudentApplication.objects.get(id=id)
+    application = get_object_or_404(StudentApplication, id=id)
     hostels = Hostel.objects.all()
 
     hostel_data = []
@@ -363,10 +338,6 @@ def approve_application(request, id):
         selected_hostel = Hostel.objects.get(id=hostel_id)
 
         # Update application
-        application.status = 'APPROVED'
-        application.assigned_hostel = selected_hostel
-        application.save()
-
         rooms = Room.objects.filter(hostel=selected_hostel)
         total_capacity = sum(room.capacity for room in rooms)
         total_occupied = sum(room.occupied for room in rooms)
@@ -374,8 +345,12 @@ def approve_application(request, id):
         if total_occupied >= total_capacity:
             messages.error(request, "Hostel is Full")
             return redirect('view_applications')
-        
-        # Update student profile
+
+        # approve after check
+        application.status = 'APPROVED'
+        application.assigned_hostel = selected_hostel
+        application.save()
+
         profile = application.student
         profile.is_approved = True
         profile.hostel = selected_hostel
@@ -398,7 +373,7 @@ def reject_application(request, id):
     if request.user.role != 'MONITOR':
         return redirect('login')
 
-    application = StudentApplication.objects.get(id=id)
+    application = get_object_or_404(StudentApplication, id=id)
     application.status = 'REJECTED'
     application.save()
 
