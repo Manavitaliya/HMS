@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="overlay"></div>
+
+    <div class="hero-content">
+        <h1 class="hero-title">Sardar Patel Hostel</h1>
+        <p class="hero-subtitle">Smart and Secure Hostel Management</p>
+        <p></p>
+    </div>
+</section>
+
+<!-- Hostel campus-->
+<section class="container my-5">
+    <h2 class="text-center mb-4">Our Campuses</h2>
+
+    <div class="row">
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 1</h5>
+                    <p>Surat, Gujarat - 395007</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 2</h5>
+                    <p>Ahmedabad, Gujarat - 380015</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 3</h5>
+                    <p>Vadodara, Gujarat - 390001</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 4</h5>
+                    <p>Rajkot, Gujarat - 360001</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 5</h5>
+                    <p>Bhavnagar, Gujarat - 364001</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h5>Campus 6</h5>
+                    <p>Junagadh, Gujarat - 362001</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+
+<!-- GALLERY SECTION -->
+<section class="container my-5">
+    <h2 class="text-center mb-4">Hostel Gallery</h2>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+                <img src="https://images.unsplash.com/photo-1590490359854-dfba19688d70">
+            </div>
+
+            <div class="swiper-slide">
+                <img src="https://images.unsplash.com/photo-1560448204-603b3fc33ddc">
+            </div>
+
+            <div class="swiper-slide">
+                <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511">
+            </div>
+
+            <div class="swiper-slide">
+                <img src="https://images.unsplash.com/photo-1586105251261-72a756497a11">
+            </div>
+
+            <div class="swiper-slide">
+                <img src="https://images.unsplash.com/photo-1615873968403-89e068629265">
+            </div>
+
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</section>
+
+<!-- STYLE -->
+<style>
+.hero {
+    height: 85vh;
+    background: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2') no-repeat center center/cover;
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+.hero-content {
+    position: relative;
+    color: white;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.hero-subtitle {
+    font-size: 20px;
+}
+
+/* Swiper */
+.swiper {
+    width: 100%;
+    padding-top: 40px;
+    padding-bottom: 60px;
+}
+
+.swiper-slide {
+    width: 300px;
+}
+
+.swiper-slide img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+/* Center image bigger */
+.swiper-slide-active {
+    transform: scale(1.2);
+    transition: 0.3s;
+}
+</style>
+
+<!-- SCRIPTS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+<script>
+var swiper = new Swiper(".mySwiper", {
+    effect: "coverflow",
+    centeredSlides: true,
+    slidesPerView: "auto",
+
+    coverflowEffect: {
+        rotate: 0,
+        stretch: 0,
+        depth: 150,
+        modifier: 2,
+        slideShadows: false,
+    },
+
+    navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+    },
+});
+</script>
+
+{% endblock %}

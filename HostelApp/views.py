@@ -10,6 +10,12 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 
 
+# -----------------HOME --------------------
+
+def home(request):
+    return render(request, 'home.html')
+
+
 # ---------------- LOGIN ----------------
 
 def login_view(request):
