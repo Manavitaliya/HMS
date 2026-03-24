@@ -18,61 +18,16 @@
     <h2 class="text-center mb-4">Our Campuses</h2>
 
     <div class="row">
-
+        {% for hostel in hostels %}
         <div class="col-md-4 mb-4">
             <div class="card shadow">
                 <div class="card-body text-center">
-                    <h5>Campus 1</h5>
-                    <p>Surat, Gujarat - 395007</p>
+                    <h5>{{ hostel.name }}</h5>
+                    <p>{{ hostel.address }}</p>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Campus 2</h5>
-                    <p>Ahmedabad, Gujarat - 380015</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Campus 3</h5>
-                    <p>Vadodara, Gujarat - 390001</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Campus 4</h5>
-                    <p>Rajkot, Gujarat - 360001</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Campus 5</h5>
-                    <p>Bhavnagar, Gujarat - 364001</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Campus 6</h5>
-                    <p>Junagadh, Gujarat - 362001</p>
-                </div>
-            </div>
-        </div>
-
+        {% endfor %}
     </div>
 </section>
 

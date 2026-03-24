@@ -25,6 +25,7 @@ class User(AbstractUser):
 
 class Hostel(models.Model):
     name = models.CharField(max_length=100)
+    address = models.TextField(null=True)
     total_rooms = models.IntegerField()
     monthly_fee = models.DecimalField(max_digits=10, decimal_places=2)
 

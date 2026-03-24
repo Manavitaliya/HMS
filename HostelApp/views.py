@@ -13,7 +13,8 @@ from django.shortcuts import get_object_or_404
 # -----------------HOME --------------------
 
 def home(request):
-    return render(request, 'home.html')
+    hostels = Hostel.objects.all()[:10] # campuses
+    return render(request, 'home.html', {'hostels': hostels})
 
 
 # ---------------- LOGIN ----------------
