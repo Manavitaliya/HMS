@@ -1,37 +1,108 @@
 {% extends 'base.html' %}
+
 {% block content %}
 
-<h3>Student Registration</h3>
-{% if form.errors %}
-    <div style="color:red;">
-        {{ form.errors }}
+<style>
+.register-container {
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff8e1;
+}
+
+.register-box {
+    width: 360px;
+    padding: 28px;
+    background: white;
+    border-radius: 10px;
+    border-top: 5px solid #f39c12;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.register-box h2 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: gray;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    margin-bottom: 15px;
+}
+
+.form-row input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+.form-row input:focus {
+    border-color: #2c3e50;
+}
+
+.btn-register {
+    width: 100%;
+    padding: 10px;
+    background: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-register:hover {
+    background: #d68910;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+</style>
+
+<div class="register-container">
+    <div class="register-box">
+
+        <h2>Student Registration</h2>
+        <p class="subtitle">Sardar Patel Hostel</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="form-row">
+                <input type="email" name="email" placeholder="Email" required>
+            </div>
+
+            <div class="form-row">
+                <input type="password" name="password1" placeholder="Password" required>
+            </div>
+
+            <div class="form-row">
+                <input type="password" name="password2" placeholder="Confirm Password" required>
+            </div>
+
+            <button type="submit" class="btn-register">Register</button>
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a href="{% url 'login' %}">Login</a>
+        </p>
+
     </div>
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-
-    <h3>Account Info</h3>
-    {{ form.username }}<br>
-    {{ form.email }}<br>
-    {{ form.password }}<br>
-    {{ form.confirm_password }}<br>
-
-    <h3>Personal Info</h3>
-    {{ form.full_name }}<br>
-    {{ form.dob }}<br>
-    {{ form.gender }}<br>
-    {{ form.address }}<br>
-    {{ form.contact }}<br>
-
-    <h3>Academic Info</h3>
-    {{ form.course }}<br>
-    {{ form.college_name }}<br>
-    {{ form.college_year }}<br>
-
-    <h3>Hostel Preference</h3>
-    {{ form.preferred_hostel }}<br><br>
-
-    <button type="submit">Register</button>
-</form>
+</div>
 
 {% endblock %}
