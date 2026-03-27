@@ -1,12 +1,217 @@
 {% extends 'base.html' %}
+
 {% block content %}
 
-<h3>Apply For Hostel</h3>
+<style>
+    body {
+        background: #fff8e1;
+        font-family: Arial, sans-serif;
+    }
+
+    .form-container {
+        width: 65%;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #ff9800;
+        margin-bottom: 8px;
+        letter-spacing : 4px;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-size: 24px;
+        color: gray;
+        margin-bottom: 30px;
+        letter-spacing : 5px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #ff9800;
+        box-shadow: 0 0 5px #ff9800;
+    }
+
+    .row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .row .form-group {
+        flex: 1;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-submit:hover {
+        background: #e68900;
+    }
+</style>
+
+<div class="form-container">
+    <h2>Hostel Application Form</h2>
+    <p class="subtitle">Sardar Patel Hostel</p>
+
 
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn btn-success">Submit Application</button>
+
+    <!-- Name -->
+    <div class="row">
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" name="first_name" placeholder="Your Name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Middle Name</label>
+            <input type="text" name="middle_name" placeholder="Father Name">
+        </div>
+
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" name="last_name" placeholder="Surname" required>
+        </div>
+    </div>
+
+    <!-- DOB & Gender -->
+    <div class="row">
+        <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" name="dob" required>
+        </div>
+
+        <div class="form-group">
+            <label>Gender</label>
+            <select name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="form-group">
+        <label>Contact Number</label>
+        <input type="text" name="contact" placeholder="9876543210" required>
+    </div>
+
+    <div class="form-group">
+        <label>Father Contact Number</label>
+        <input type="text" name="Father contact" placeholder="9876543210" required>
+    </div>
+
+    <!-- Address -->
+    <div class="form-group">
+        <label>Address</label>
+        <textarea name="address" rows="2" placeholder="Plot no. : 2490, Street no. 4, Akshardham society, Near Shaktimata Temple, Kaliyabid" required></textarea>
+    </div>
+
+    <!-- City & District -->
+    <div class="row">
+        <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city" placeholder="Ahmedabad" required>
+        </div>
+
+        <div class="form-group">
+            <label>District</label>
+            <input type="text" name="district" placeholder="Ahmedabad" required>
+        </div>
+    </div>
+
+    <!-- College Info -->
+    <div class="form-group">
+        <label>Course</label>
+        <input type="text" name="course" placeholder="BCA / B.Tech IT / B.Com / BBA / MCA / M.Com / MBA" required>
+    </div>
+
+    <div class="form-group">
+        <label>College Name</label>
+        <input type="text" name="college_name" placeholder="Gujarat University" required>
+    </div>
+
+    <!-- Year & Semester -->
+    <div class="row">
+        <div class="form-group">
+            <label>College Year</label>
+            <select name="college_year" required>
+                <option value="">Select Year</option>
+                <option value="1st">1st Year</option>
+                <option value="2nd">2nd Year</option>
+                <option value="3rd">3rd Year</option>
+                <option value="4th">4th Year</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Semester</label>
+            <select name="semester" required>
+                <option value="">Select Semester</option>
+                <option value="Sem 1">Sem 1</option>
+                <option value="Sem 2">Sem 2</option>
+                <option value="Sem 3">Sem 3</option>
+                <option value="Sem 4">Sem 4</option>
+                <option value="Sem 5">Sem 5</option>
+                <option value="Sem 6">Sem 6</option>
+                <option value="Sem 7">Sem 7</option>
+                <option value="Sem 8">Sem 8</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Hostel Preference -->
+    <div class="form-group">
+        <label>Hostel Preference</label>
+        <select name="hostel_preference" required>
+            <option value="">Select Hostel</option>
+            <option value="Hostel A">Hostel A</option>
+            <option value="Hostel B">Hostel B</option>
+            <option value="Hostel C">Hostel C</option>
+        </select>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn-submit">Apply Now</button>
+
 </form>
+
+</div>
 
 {% endblock %}
