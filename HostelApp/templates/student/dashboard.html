@@ -1,14 +1,227 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Student Dashboard</h2>
-<hr>
 
-<a href="{% url 'student_view_hostels' %}" 
-   class="btn btn-primary mt-2">View Hostels</a>
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #f4f6f9;
+}
 
-<a href="{% url 'apply_hostel' %}" 
-   class="btn btn-success mt-2">Apply For Hostel</a>
+/* SIDEBAR */
+.sidebar {
+    width: 230px;
+    height: 100vh;
+    background: #ff9800;
+    position: fixed;
+    color: white;
+    padding-top: 20px;
+}
 
-<a href="{% url 'logout' %}" 
-   class="btn btn-danger mt-2">Logout</a>
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+/* MAIN */
+.main {
+    margin-left: 230px;
+    padding: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* CARDS */
+.cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.title {
+    font-size: 14px;
+    color: gray;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff9800;
+}
+
+/* SECTION */
+.section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.btn {
+    padding: 8px 15px;
+    background: #ff9800;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #e68900;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+</style>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+    <h2>🏠 HMS</h2>
+
+```
+<a href="#">Dashboard</a>
+<a href="#">My Application</a>
+<a href="#">Room Details</a>
+<a href="#">Fees</a>
+<a href="#">Complaints</a>
+<a href="{% url 'logout' %}">Logout</a>
+```
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+```
+<!-- TOPBAR -->
+<div class="topbar">
+    <div>Student Dashboard</div>
+    <div>{{ request.user.username }}</div>
+</div>
+
+<!-- CARDS -->
+<div class="cards">
+    <div class="card">
+        <div class="title">Hostel</div>
+        <div class="value">{{ application.hostel.name }}</div>
+    </div>
+
+    <div class="card">
+        <div class="title">Room</div>
+        <div class="value">{{ application.room.number }}</div>
+    </div>
+
+    <div class="card">
+        <div class="title">Status</div>
+        <div class="value">{{ application.status }}</div>
+    </div>
+
+    <div class="card">
+        <div class="title">Fee</div>
+        <div class="value">Pending</div>
+    </div>
+</div>
+
+<!-- ROOM DETAILS -->
+<div class="section">
+    <h3>🏠 Room Details</h3>
+    <p><strong>Hostel:</strong> {{ application.hostel.name }}</p>
+    <p><strong>Room:</strong> {{ application.room.number }}</p>
+    <p><strong>Capacity:</strong> {{ application.room.capacity }}</p>
+</div>
+
+<!-- FEES -->
+<div class="section">
+    <h3>💰 Fee Details</h3>
+
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>Hostel Fee</td>
+            <td>5000</td>
+            <td>Pending</td>
+        </tr>
+    </table>
+
+    <br>
+    <button class="btn">Pay Now</button>
+</div>
+
+<!-- COMPLAINT -->
+<div class="section">
+    <h3>🛠 Complaints</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="complaint" rows="3" placeholder="Write your issue..."></textarea>
+        <br><br>
+        <button class="btn">Submit</button>
+    </form>
+
+    <hr>
+
+    {% for c in complaints %}
+        <p><b>{{ c.text }}</b> - {{ c.status }}</p>
+    {% empty %}
+        <p>No complaints yet</p>
+    {% endfor %}
+</div>
+```
+
+</div>
+
 {% endblock %}

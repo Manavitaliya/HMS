@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 # --------------------TRY VIEWS-------------------
 
 def check(request):
-    return render(request, 'student/apply_hostel.html')
+    return render(request, 'student/dashboard.html')
 
 # -----------------HOME --------------------
 
