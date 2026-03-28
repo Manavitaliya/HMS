@@ -216,9 +216,9 @@ textarea {
 
     {% for c in complaints %}
         <p><b>{{ c.text }}</b> - {{ c.status }}</p>
-    {% empty %}
+    {% comment %} {% empty %}
         <p>No complaints yet</p>
-    {% endfor %}
+    {% endfor %} {% endcomment %}
 </div>
 ```
 
