@@ -142,7 +142,6 @@ textarea {
 
 <div class="main">
 
-```
 <!-- TOPBAR -->
 <div class="topbar">
     <div>Student Dashboard</div>
@@ -217,10 +216,9 @@ textarea {
     {% for c in complaints %}
         <p><b>{{ c.text }}</b> - {{ c.status }}</p>
     {% comment %} {% empty %}
-        <p>No complaints yet</p>
-    {% endfor %} {% endcomment %}
+        <p>No complaints yet</p>{% endcomment %}
+    {% endfor %} 
 </div>
-```
 
 </div>
 
