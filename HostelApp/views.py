@@ -41,6 +41,7 @@ def student_register(request):
             messages.success(request, "Registration successful! Please login.")
             return redirect('login')
         else:
+            print(form.errors) 
     else:
         form = StudentRegisterForm()
 
@@ -49,7 +50,7 @@ def student_register(request):
 
 # ---------------- LOGIN ----------------
 
-def login(request):
+def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
