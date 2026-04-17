@@ -75,6 +75,12 @@
         <h2>Student Registration</h2>
         <p class="subtitle">Sardar Patel Hostel</p>
 
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
 
@@ -93,8 +99,10 @@
             <div class="form-row">
                 <input type="password" name="password2" placeholder="Confirm Password" required>
             </div>
-
-            <button type="submit" class="btn-register">Register</button>
+            <a  class="btn btn-success">
+                Register
+            </a>
+            <button type="submit" class="btn-register" href="{% url 'student_register' %}">Register</button>
         </form>
 
         <p class="login-link">

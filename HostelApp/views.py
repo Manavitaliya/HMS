@@ -22,6 +22,30 @@ def home(request):
     hostels = Hostel.objects.all()[:10] # campuses
     return render(request, 'home.html', {'hostels': hostels})
 
+# --------------- STUDENT PANNEL---------------------
+
+# >>>>>> STUDENT REGISTRATION <<<<<<
+
+def student_register(request):
+    if request.method == 'POST':
+        form = StudentRegisterForm(request.POST)
+
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password'],
+                role='STUDENT'
+            )
+
+            messages.success(request, "Registration successful! Please login.")
+            return redirect('login')
+        else:
+    else:
+        form = StudentRegisterForm()
+
+    return render(request, 'student/register.html', {'form': form})
+
 
 # ---------------- LOGIN ----------------
 
@@ -66,6 +90,10 @@ def redirect_dashboard(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+
+
 
 
 # ---------------- DASHBOARDS ----------------
@@ -245,45 +273,45 @@ def student_dashboard(request):
 
 # ---------------- STUDENT REGISTER ---------------------
 
-def student_register(request):
-    if request.method == 'POST':
-        form = StudentRegisterForm(request.POST)
+# def student_register(request):
+#     if request.method == 'POST':
+#         form = StudentRegisterForm(request.POST)
 
-        if form.is_valid():
-            # Create User
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password'],
-                role='STUDENT'
-            )
+#         if form.is_valid():
+#             # Create User
+#             user = User.objects.create_user(
+#                 username=form.cleaned_data['username'],
+#                 email=form.cleaned_data['email'],
+#                 password=form.cleaned_data['password'],
+#                 role='STUDENT'
+#             )
 
-            # Create Student Profile
-            profile = StudentProfile.objects.create(
-                user=user,
-                full_name=form.cleaned_data['full_name'],
-                dob=form.cleaned_data['dob'],
-                gender=form.cleaned_data['gender'],
-                address=form.cleaned_data['address'],
-                contact=form.cleaned_data['contact'],
-                course=form.cleaned_data['course'],
-                college_name=form.cleaned_data['college_name'],
-                college_year=form.cleaned_data['college_year']
-            )
+#             # Create Student Profile
+#             profile = StudentProfile.objects.create(
+#                 user=user,
+#                 full_name=form.cleaned_data['full_name'],
+#                 dob=form.cleaned_data['dob'],
+#                 gender=form.cleaned_data['gender'],
+#                 address=form.cleaned_data['address'],
+#                 contact=form.cleaned_data['contact'],
+#                 course=form.cleaned_data['course'],
+#                 college_name=form.cleaned_data['college_name'],
+#                 college_year=form.cleaned_data['college_year']
+#             )
 
-            # Create Hostel Application
-            StudentApplication.objects.create(
-                student=profile,  # (make sure you updated model)
-                preferred_hostel=form.cleaned_data['preferred_hostel']
-            )
+#             # Create Hostel Application
+#             StudentApplication.objects.create(
+#                 student=profile,  # (make sure you updated model)
+#                 preferred_hostel=form.cleaned_data['preferred_hostel']
+#             )
 
-            messages.success(request, "Registration successful! Please login.")
-            return redirect('login')
+#             messages.success(request, "Registration successful! Please login.")
+#             return redirect('login')
 
-    else:
-        form = StudentRegisterForm()
+#     else:
+#         form = StudentRegisterForm()
 
-    return render(request, 'student/register.html', {'form': form})
+#     return render(request, 'student/register.html', {'form': form})
 
 
 # ---------------- VIEW HOSTELS (STUDENT) ----------------
@@ -329,7 +357,6 @@ def approve_application(request, id):
 
     application = get_object_or_404(StudentApplication, id=id)
     hostels = Hostel.objects.all()
-
     hostel_data = []
 
     for hostel in hostels:

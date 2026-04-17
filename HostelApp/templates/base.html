@@ -75,6 +75,16 @@
     </div>
 </nav>
 
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <!-- Main Content -->
 <main class="container mt-4">
     {% block content %}
