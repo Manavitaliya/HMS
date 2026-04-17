@@ -1,11 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 from django.conf import settings
 
 
-
-# --------------------USER MODEL-------------------------------
+# -------------------- USER MODEL --------------------
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -18,14 +16,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} - {self.role}"
-    
 
 
 # ---------------- HOSTEL MODEL ----------------
 
 class Hostel(models.Model):
     name = models.CharField(max_length=100)
-    address = models.TextField(null=True)
+    address = models.TextField(null=True, blank=True)
     total_rooms = models.IntegerField()
     monthly_fee = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -50,20 +47,30 @@ class Monitor(models.Model):
 
     def __str__(self):
         return self.user.username
-    
-    
-# -------------------- ROOM MODEL --------------------
+
+
+# ---------------- ROOM MODEL ----------------
 
 class Room(models.Model):
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
     room_number = models.CharField(max_length=20)
     capacity = models.IntegerField()
-    occupied = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.hostel.name} - Room {self.room_number}"
 
-    
+
+# ---------------- BED MODEL (NEW - IMPORTANT) ----------------
+
+class Bed(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    bed_number = models.CharField(max_length=10)
+    is_occupied = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.room} - Bed {self.bed_number}"
+
+
 # ---------------- STUDENT PROFILE ----------------
 
 class StudentProfile(models.Model):
@@ -82,18 +89,18 @@ class StudentProfile(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    full_name = models.CharField(max_length=100, null=True, blank=True)
-    dob = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-    contact = models.CharField(max_length=10, null=True, blank=True, unique=True)
-    course = models.CharField(max_length=100, null=True, blank=True)
-    college_name = models.CharField(max_length=150, null=True, blank=True)
-    college_year = models.CharField(max_length=10, choices=YEAR_CHOICES, null=True, blank=True)
+    full_name = models.CharField(max_length=100)
+    dob = models.DateField()
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    address = models.TextField()
+    contact = models.CharField(max_length=10, unique=True)
+    course = models.CharField(max_length=100)
+    college_name = models.CharField(max_length=150)
+    college_year = models.CharField(max_length=10, choices=YEAR_CHOICES)
 
     hostel = models.ForeignKey(Hostel, on_delete=models.SET_NULL, null=True, blank=True)
-    room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True, blank=True)
-    is_approved = models.BooleanField(default=False)
+    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True)
+    bed = models.ForeignKey(Bed, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -108,8 +115,13 @@ class StudentApplication(models.Model):
         ('REJECTED', 'Rejected'),
     ]
 
-    student = models.OneToOneField(StudentProfile, on_delete=models.CASCADE)
-    preferred_hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE)
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+
+    preferred_hostel = models.ForeignKey(
+        Hostel,
+        on_delete=models.CASCADE,
+        related_name='preferred_applications'
+    )
 
     assigned_hostel = models.ForeignKey(
         Hostel,
@@ -120,12 +132,76 @@ class StudentApplication(models.Model):
     )
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    applied_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.student.full_name} - {self.status}"
-    
-    
-# ---------------------STUDENT REGESTRATION------------------------------
 
-    
-    
+
+# ---------------- PAYMENT MODEL ----------------
+
+class Payment(models.Model):
+    PAYMENT_STATUS = [
+        ('PENDING', 'Pending'),
+        ('PARTIAL', 'Partial'),
+        ('PAID', 'Paid'),
+    ]
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    month = models.CharField(max_length=20)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='PENDING')
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.month}"
+
+
+# ---------------- PENALTY MODEL ----------------
+
+class Penalty(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    reason = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - Penalty"
+
+
+# ---------------- COMPLAINT MODEL ----------------
+
+class Complaint(models.Model):
+    STATUS_CHOICES = [
+        ('OPEN', 'Open'),
+        ('RESOLVED', 'Resolved'),
+    ]
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN')
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - Complaint"
+
+
+# ---------------- LEAVE MODEL ----------------
+
+class Leave(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    ]
+
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    from_date = models.DateField()
+    to_date = models.DateField()
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+
+    def __str__(self):
+        return f"{self.student.full_name} - Leave"
