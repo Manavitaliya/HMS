@@ -24,7 +24,7 @@ urlpatterns = [
     # Student
     path('student/register/', views.student_register, name='student_register'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
-    path('student/apply/', views.student_dashboard, name='apply_hostel'),
+    path('student/apply/', views.apply_hostel, name='apply_hostel'),
     path('student/view-hostels/', views.student_view_hostels, name='student_view_hostels'),
 
     # Monitor

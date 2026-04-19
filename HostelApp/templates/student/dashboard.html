@@ -2,224 +2,110 @@
 
 {% block content %}
 
+<div class="container mt-4">
+
+    <h2 class="mb-4">Welcome, {{ request.user.username }}</h2>
+
+    <!-- CASE 1: NO PROFILE -->
+    {% if not profile %}
+        <div class="card shadow p-4 text-center">
+            <h4>You have not applied for hostel yet</h4>
+            <p>Fill the application form to continue</p>
+
+            <a href="{% url 'apply_hostel' %}" class="btn btn-primary">
+                Apply for Hostel
+            </a>
+        </div>
+
+        <h3 class="mb-4 mt-5">Our Campuses</h3>
+
+        <div class="row">
+            {% for hostel in hostels %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-body">
+
+                            <h5 class="card-title">{{ hostel.name }}</h5>
+
+                            {% if hostel.location %}
+                                <p><strong>Location:</strong> {{ hostel.location }}</p>
+                            {% endif %}
+
+                            <p><strong>Address:</strong> {{ hostel.address }}</p>
+                            <p><strong>Rooms:</strong> {{ hostel.total_rooms }}</p>
+                            <p><strong>Monthly Fee:</strong> ₹{{ hostel.monthly_fee }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- CASE 2: PROFILE EXISTS -->
+    {% if profile %}
+
+        <!-- APPLICATION STATUS -->
+        <div class="card shadow mb-4 p-4">
+            <h4>Application Status</h4>
+
+            {% if application %}
+                <h5>Status:
+                    <span class="
+                        {% if application.status == 'PENDING' %}text-warning
+                        {% elif application.status == 'APPROVED' %}text-success
+                        {% else %}text-danger{% endif %}
+                    ">
+                        {{ application.status }}
+                    </span>
+                </h5>
+
+                {% if application.status == "PENDING" %}
+                    <p>Your application is under review.</p>
+
+                {% elif application.status == "APPROVED" %}
+                    <p><strong>Hostel:</strong> {{ application.assigned_hostel.name }}</p>
+
+                {% elif application.status == "REJECTED" %}
+                    <p>Your application was rejected.</p>
+
+                    <a href="{% url 'apply_hostel' %}" class="btn btn-warning">
+                        Reapply
+                    </a>
+                {% endif %}
+
+            {% endif %}
+        </div>
+
+        <!-- HOSTEL INFO AFTER APPROVAL -->
+        {% if profile.hostel %}
+        <div class="card shadow p-4">
+            <h4>Hostel Details</h4>
+            <p><strong>Hostel:</strong> {{ profile.hostel.name }}</p>
+
+            {% if profile.room %}
+                <p><strong>Room:</strong> {{ profile.room.room_number }}</p>
+            {% else %}
+                <p class="text-warning">Room not assigned yet</p>
+            {% endif %}
+
+            {% if profile.bed %}
+                <p><strong>Bed:</strong> {{ profile.bed.bed_number }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #f4f6f9;
-}
-
-/* SIDEBAR */
-.sidebar {
-    width: 230px;
-    height: 100vh;
-    background: #ff9800;
-    position: fixed;
-    color: white;
-    padding-top: 20px;
-}
-
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.sidebar a {
-    display: block;
-    padding: 12px 20px;
-    color: white;
-    text-decoration: none;
+.card {
     transition: 0.3s;
 }
-
-.sidebar a:hover {
-    background: rgba(0,0,0,0.1);
-}
-
-/* MAIN */
-.main {
-    margin-left: 230px;
-    padding: 20px;
-}
-
-/* TOPBAR */
-.topbar {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-/* CARDS */
-.cards {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.card {
-    flex: 1;
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.title {
-    font-size: 14px;
-    color: gray;
-}
-
-.value {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ff9800;
-}
-
-/* SECTION */
-.section {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-table th, table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    text-align: center;
-}
-
-.btn {
-    padding: 8px 15px;
-    background: #ff9800;
-    color: white;
-    border-radius: 6px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #e68900;
-}
-
-textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+.card:hover {
+    transform: translateY(-8px);
 }
 </style>
-
-<!-- SIDEBAR -->
-
-<div class="sidebar">
-    <h2>🏠 HMS</h2>
-
-```
-<a href="#">Dashboard</a>
-<a href="#">My Application</a>
-<a href="#">Room Details</a>
-<a href="#">Fees</a>
-<a href="#">Complaints</a>
-<a href="{% url 'logout' %}">Logout</a>
-```
-
-</div>
-
-<!-- MAIN -->
-
-<div class="main">
-
-<!-- TOPBAR -->
-<div class="topbar">
-    <div>Student Dashboard</div>
-    <div>{{ request.user.username }}</div>
-</div>
-
-<!-- CARDS -->
-<div class="cards">
-    <div class="card">
-        <div class="title">Hostel</div>
-        <div class="value">{{ application.hostel.name }}</div>
-    </div>
-
-    <div class="card">
-        <div class="title">Room</div>
-        <div class="value">{{ application.room.number }}</div>
-    </div>
-
-    <div class="card">
-        <div class="title">Status</div>
-        <div class="value">{{ application.status }}</div>
-    </div>
-
-    <div class="card">
-        <div class="title">Fee</div>
-        <div class="value">Pending</div>
-    </div>
-</div>
-
-<!-- ROOM DETAILS -->
-<div class="section">
-    <h3>🏠 Room Details</h3>
-    <p><strong>Hostel:</strong> {{ application.hostel.name }}</p>
-    <p><strong>Room:</strong> {{ application.room.number }}</p>
-    <p><strong>Capacity:</strong> {{ application.room.capacity }}</p>
-</div>
-
-<!-- FEES -->
-<div class="section">
-    <h3>💰 Fee Details</h3>
-
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Status</th>
-        </tr>
-        <tr>
-            <td>Hostel Fee</td>
-            <td>5000</td>
-            <td>Pending</td>
-        </tr>
-    </table>
-
-    <br>
-    <button class="btn">Pay Now</button>
-</div>
-
-<!-- COMPLAINT -->
-<div class="section">
-    <h3>🛠 Complaints</h3>
-
-    <form method="POST">
-        {% csrf_token %}
-        <textarea name="complaint" rows="3" placeholder="Write your issue..."></textarea>
-        <br><br>
-        <button class="btn">Submit</button>
-    </form>
-
-    <hr>
-
-    {% for c in complaints %}
-        <p><b>{{ c.text }}</b> - {{ c.status }}</p>
-    {% comment %} {% empty %}
-        <p>No complaints yet</p>{% endcomment %}
-    {% endfor %} 
-</div>
-
-</div>
 
 {% endblock %}

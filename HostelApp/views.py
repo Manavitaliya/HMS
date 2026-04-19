@@ -22,32 +22,6 @@ def home(request):
     hostels = Hostel.objects.all()[:10] # campuses
     return render(request, 'home.html', {'hostels': hostels})
 
-# --------------- STUDENT PANNEL---------------------
-
-# >>>>>> STUDENT REGISTRATION <<<<<<
-
-def student_register(request):
-    if request.method == 'POST':
-        form = StudentRegisterForm(request.POST)
-
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password'],
-                role='STUDENT'
-            )
-
-            messages.success(request, "Registration successful! Please login.")
-            return redirect('login')
-        else:
-            print(form.errors) 
-    else:
-        form = StudentRegisterForm()
-
-    return render(request, 'student/register.html', {'form': form})
-
-
 # ---------------- LOGIN ----------------
 
 def login_view(request):
@@ -90,11 +64,58 @@ def redirect_dashboard(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 
+# -----------------------------------------------------------------
+# --------------- STUDENT PANNEL-----------------------------------
+# -----------------------------------------------------------------
+
+# >>>>>> STUDENT REGISTRATION <<<<<<
+
+def student_register(request):
+    if request.method == 'POST':
+        form = StudentRegisterForm(request.POST)
+
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password'],
+                role='STUDENT'
+            )
+
+            messages.success(request, "Registration successful! Please login.")
+            return redirect('login')
+        else:
+            print(form.errors) 
+    else:
+        form = StudentRegisterForm()
+
+    return render(request, 'student/register.html', {'form': form})
 
 
+# >>>>> STUDENT DASHBOARD<<<<<
+
+@login_required
+def student_dashboard(request):
+    # if request.user.role != 'STUDENT':
+    #     return redirect('login')
+
+    # profile = StudentProfile.objects.get(user=request.user)
+
+    # if not profile.is_approved:
+    #     return render(request, 'student/pending.html')
+    hostels = Hostel.objects.all()
+    
+    return render(request, 'student/dashboard.html', {'hostels': hostels})
+
+
+# >>>>> APPLY HOSTEL <<<<<
+
+@login_required
+def apply_hostel(request):
+    return render(request, 'student/apply_hostel.html')
 
 
 # ---------------- DASHBOARDS ----------------
@@ -256,21 +277,6 @@ def delete_warden(request, id):
 
     return redirect('view_wardens')
 
-
-# -----------------STUDENT DASHBOARD-----------------------------------
-
-
-@login_required
-def student_dashboard(request):
-    if request.user.role != 'STUDENT':
-        return redirect('login')
-
-    profile = StudentProfile.objects.get(user=request.user)
-
-    if not profile.is_approved:
-        return render(request, 'student/pending.html')
-
-    return render(request, 'student/dashboard.html')
 
 # ---------------- STUDENT REGISTER ---------------------
 

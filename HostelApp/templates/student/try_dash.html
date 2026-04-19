@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- Welcome -->
+    <h2 class="mb-4">Welcome, {{ request.user.username }}</h2>
+
+    <!-- PROFILE CARD -->
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <h4>Profile Details</h4>
+            <p><strong>Name:</strong> {{ profile.full_name }}</p>
+            <p><strong>College:</strong> {{ profile.college_name }}</p>
+            <p><strong>Course:</strong> {{ profile.course }}</p>
+            <p><strong>Year:</strong> {{ profile.college_year }}</p>
+            <p><strong>Contact:</strong> {{ profile.contact }}</p>
+        </div>
+    </div>
+
+    <!-- APPLICATION STATUS -->
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <h4>Application Status</h4>
+
+            {% if application %}
+
+                <h5>Status: 
+                    <span class="
+                        {% if application.status == 'PENDING' %}text-warning
+                        {% elif application.status == 'APPROVED' %}text-success
+                        {% else %}text-danger{% endif %}
+                    ">
+                        {{ application.status }}
+                    </span>
+                </h5>
+
+                {% if application.status == "PENDING" %}
+                    <p>Your application is under review.</p>
+
+                {% elif application.status == "APPROVED" %}
+                    <p><strong>Assigned Hostel:</strong> {{ application.assigned_hostel.name }}</p>
+
+                {% elif application.status == "REJECTED" %}
+                    <p>Your application was rejected.</p>
+                    <a href="{% url 'apply_hostel' %}" class="btn btn-warning">Reapply</a>
+                {% endif %}
+
+            {% else %}
+                <a href="{% url 'apply_hostel' %}" class="btn btn-primary">Apply for Hostel</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- HOSTEL + ROOM INFO -->
+    {% if profile.hostel %}
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <h4>Hostel Details</h4>
+            <p><strong>Hostel:</strong> {{ profile.hostel.name }}</p>
+            <p><strong>Address:</strong> {{ profile.hostel.address }}</p>
+
+            {% if profile.room %}
+                <p><strong>Room:</strong> {{ profile.room.room_number }}</p>
+            {% else %}
+                <p class="text-warning">Room not assigned yet</p>
+            {% endif %}
+
+            {% if profile.bed %}
+                <p><strong>Bed:</strong> {{ profile.bed.bed_number }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- QUICK ACTIONS -->
+    <div class="card shadow">
+        <div class="card-body">
+            <h4>Quick Actions</h4>
+
+            <a href="#" class="btn btn-outline-primary me-2 mb-2">Pay Fees</a>
+            <a href="#" class="btn btn-outline-danger me-2 mb-2">View Penalty</a>
+            <a href="#" class="btn btn-outline-warning me-2 mb-2">Make Complaint</a>
+            <a href="#" class="btn btn-outline-success mb-2">Apply Leave</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
