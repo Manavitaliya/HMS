@@ -9,7 +9,7 @@
     }
 
     .form-container {
-        width: 65%;
+        width: 85%;
         margin: 40px auto;
         background: #fff;
         padding: 30px;
@@ -129,12 +129,12 @@
     <!-- Contact -->
     <div class="form-group">
         <label>Contact Number</label>
-        <input type="text" name="contact" placeholder="9876543210" required>
+        <input type="text" name="contact" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
     </div>
 
     <div class="form-group">
         <label>Father Contact Number</label>
-        <input type="text" name="Father contact" placeholder="9876543210" required>
+        <input type="text" name="Father contact" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10" required>
     </div>
 
     <!-- Address -->
@@ -199,11 +199,15 @@
     <!-- Hostel Preference -->
     <div class="form-group">
         <label>Hostel Preference</label>
-        <select name="hostel_preference" required>
-            <option value="">Select Hostel</option>
-            <option value="Hostel A">Hostel A</option>
-            <option value="Hostel B">Hostel B</option>
-            <option value="Hostel C">Hostel C</option>
+        <select name="preferred_hostel" class="form-select" required>
+            <option value="">Select Your Preference Hostel</option>
+
+            {% for hostel in hostels %}
+                <option value="{{ hostel.id }}">
+                    {{ hostel.name }} - {{ hostel.location }}
+                </option>
+            {% endfor %}
+
         </select>
     </div>
 

@@ -25,7 +25,6 @@ urlpatterns = [
     path('student/register/', views.student_register, name='student_register'),
     path('student/dashboard/', views.student_dashboard, name='student_dashboard'),
     path('student/apply/', views.apply_hostel, name='apply_hostel'),
-    path('student/view-hostels/', views.student_view_hostels, name='student_view_hostels'),
 
     # Monitor
     path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),

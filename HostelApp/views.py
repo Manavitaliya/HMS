@@ -106,16 +106,97 @@ def student_dashboard(request):
 
     # if not profile.is_approved:
     #     return render(request, 'student/pending.html')
+
     hostels = Hostel.objects.all()
-    
-    return render(request, 'student/dashboard.html', {'hostels': hostels})
+
+    profile = StudentProfile.objects.filter(user=request.user).first()
+
+    if not profile:
+        return render(request, 'student/dashboard.html', {
+            'no_profile': True}, {'hostels': hostels})
+
+    application = StudentApplication.objects.filter(student=profile).last()
+
+    if application.status == 'PENDING':
+        return render(request, 'student/dashboard.html', {
+            'pending': True, 'hostels': hostels
+        })
+
+    elif application.status == 'REJECTED':
+        return render(request, 'student/dashboard.html', {
+            'rejected': True, 'hostels': hostels
+        })
+
+    elif application.status == 'APPROVED':
+        return render(request, 'student/dashboard.html', {
+            'approved': True,
+            'profile': profile, 'hostels': hostels
+        })
 
 
 # >>>>> APPLY HOSTEL <<<<<
 
+from datetime import datetime
+
 @login_required
 def apply_hostel(request):
-    return render(request, 'student/apply_hostel.html')
+    if request.user.role != 'STUDENT':
+        return redirect('login')
+
+    # Prevent multiple active applications
+    existing_application = StudentApplication.objects.filter(
+        student__user=request.user,
+        status='PENDING'
+    ).first()
+
+    if existing_application:
+        messages.warning(request, "You already have a pending application")
+        return redirect('student_dashboard')
+
+    hostels = Hostel.objects.all()
+
+    if request.method == 'POST':
+        # Get form data
+        first_name = request.POST.get('first_name')
+        middle_name = request.POST.get('middle_name')
+        last_name = request.POST.get('last_name')
+
+        full_name = f"{first_name} {middle_name} {last_name}"
+
+        dob = request.POST.get('dob')
+        gender = request.POST.get('gender')
+        contact = request.POST.get('contact')
+        address = request.POST.get('address')
+        course = request.POST.get('course')
+        college_name = request.POST.get('college_name')
+        college_year = request.POST.get('college_year')
+
+        hostel_id = request.POST.get('preferred_hostel')
+        preferred_hostel = Hostel.objects.get(id=hostel_id)
+
+        # Create Profile (IMPORTANT: only here profile created)
+        profile = StudentProfile.objects.create(
+            user=request.user,
+            full_name=full_name,
+            dob=dob,
+            gender=gender,
+            contact=contact,
+            address=address,
+            course=course,
+            college_name=college_name,
+            college_year=college_year
+        )
+
+        # Create Application
+        StudentApplication.objects.create(
+            student=profile,
+            preferred_hostel=preferred_hostel
+        )
+
+        messages.success(request, "Application Submitted Successfully")
+        return redirect('student_dashboard')
+
+    return render(request, 'student/apply_hostel.html', {'hostels': hostels})
 
 
 # ---------------- DASHBOARDS ----------------
