@@ -1,11 +1,189 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Monitor Dashboard</h2>
-<hr>
 
-<a href="{% url 'view_applications' %}" 
-   class="btn btn-primary mt-2">View Applications</a>
+<style>
 
-<a href="{% url 'logout' %}" 
-   class="btn btn-danger mt-2">Logout</a>
+/* Layout */
+.dashboard-title {
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* Cards */
+.stat-card {
+    border-radius: 18px;
+    padding: 22px;
+    color: white;
+    transition: 0.25s;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+}
+
+/* Soft gradients */
+.card-total { background: linear-gradient(135deg, #2c3e50, #4ca1af); }
+.card-pending { background: linear-gradient(135deg, #ffb347, #ffcc33); color:black;}
+.card-approved { background: linear-gradient(135deg, #00b09b, #96c93d); }
+.card-rejected { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+
+/* Glass effect */
+.glass-card {
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Table */
+.table thead {
+    background: #f1f3f5;
+}
+
+/* Filter */
+.filter-box select {
+    border-radius: 10px;
+    padding: 8px;
+}
+
+/* Buttons */
+.btn-custom {
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+</style>
+
+<div class="container">
+
+    <!-- TITLE -->
+    <h2 class="text-center mb-5 dashboard-title">Monitor Dashboard</h2>
+
+    <!-- STATS -->
+    <div class="row text-center mb-4">
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card card-total shadow">
+                <h6>Total Applications</h6>
+                <h2>{{ total }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card card-pending shadow">
+                <h6>Pending</h6>
+                <h2>{{ pending }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card card-approved shadow">
+                <h6>Approved</h6>
+                <h2>{{ approved }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="stat-card card-rejected shadow">
+                <h6>Rejected</h6>
+                <h2>{{ rejected }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTER -->
+    <div class="glass-card p-3 mb-4">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-4">
+                    <select name="status" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <select name="hostel" class="form-control">
+                        <option value="">All Hostels</option>
+                        {% for hostel in hostels %}
+                        <option value="{{ hostel.id }}">{{ hostel.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-dark w-100">Apply Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="glass-card p-3">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Applications</h5>
+
+            <a href="{% url 'view_applications' %}" class="btn btn-outline-dark btn-sm">
+                View All
+            </a>
+        </div>
+
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Preferred Hostel</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.student.full_name }}</td>
+                    <td>{{ app.preferred_hostel.name }}</td>
+
+                    <td>
+                        <span class="badge 
+                            {% if app.status == 'PENDING' %} bg-warning
+                            {% elif app.status == 'APPROVED' %} bg-success
+                            {% else %} bg-danger {% endif %}">
+                            {{ app.status }}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+                        {% if app.status == 'PENDING' %}
+                        <a href="{% url 'approve_application' app.id %}" class="btn btn-success btn-sm btn-custom">
+                            Approve
+                        </a>
+
+                        <a href="{% url 'reject_application' app.id %}" class="btn btn-danger btn-sm btn-custom">
+                            Reject
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No applications found</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
 {% endblock %}

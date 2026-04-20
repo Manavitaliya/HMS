@@ -99,13 +99,6 @@ def student_register(request):
 
 @login_required
 def student_dashboard(request):
-    # if request.user.role != 'STUDENT':
-    #     return redirect('login')
-
-    # profile = StudentProfile.objects.get(user=request.user)
-
-    # if not profile.is_approved:
-    #     return render(request, 'student/pending.html')
 
     hostels = Hostel.objects.all()
 
@@ -199,6 +192,148 @@ def apply_hostel(request):
     return render(request, 'student/apply_hostel.html', {'hostels': hostels})
 
 
+# -----------------------------------------------------------------
+# --------------- MONITOR PANNEL-----------------------------------
+# -----------------------------------------------------------------
+
+# >>>>> MONITOR DASHBORAD <<<<<
+
+@login_required
+def monitor_dashboard(request):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    applications = StudentApplication.objects.select_related(
+        'student', 'preferred_hostel'
+    )
+
+    # FILTER
+    status = request.GET.get('status')
+    hostel_id = request.GET.get('hostel')
+
+    if status:
+        applications = applications.filter(status=status)
+
+    if hostel_id:
+        applications = applications.filter(preferred_hostel_id=hostel_id)
+
+    # HOSTEL AVAILABILITY
+    hostel_data = []
+    hostels = Hostel.objects.all()
+
+    for hostel in hostels:
+        beds = Bed.objects.filter(room__hostel=hostel)
+        total = beds.count()
+        occupied = beds.filter(is_occupied=True).count()
+
+        hostel_data.append({
+            'hostel': hostel,
+            'available': total - occupied,
+            'occupied': occupied
+        })
+
+    context = {
+        'total': StudentApplication.objects.count(),
+        'pending': StudentApplication.objects.filter(status='PENDING').count(),
+        'approved': StudentApplication.objects.filter(status='APPROVED').count(),
+        'rejected': StudentApplication.objects.filter(status='REJECTED').count(),
+        'applications': applications.order_by('-applied_at')[:10],
+        'hostel_data': hostel_data,
+        'hostels': hostels
+    }
+
+    return render(request, 'monitor/dashboard.html', context)
+
+# >>>>> VIEW APPLICATIONS <<<<<
+
+@login_required
+def view_applications(request):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    applications = StudentApplication.objects.select_related(
+        'student', 'preferred_hostel'
+    ).filter(status='PENDING').order_by('-applied_at')
+
+    return render(request, 'monitor/view_applications.html', {
+        'applications': applications
+    })
+    
+    
+# >>>>> APPROVE APPLICATIONS <<<<<
+
+@login_required
+def approve_application(request, id):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    application = get_object_or_404(StudentApplication, id=id)
+
+    hostels = Hostel.objects.all()
+
+    hostel_data = []
+
+    for hostel in hostels:
+        rooms = Room.objects.filter(hostel=hostel)
+        beds = Bed.objects.filter(room__hostel=hostel)
+
+        total_beds = beds.count()
+        occupied_beds = beds.filter(is_occupied=True).count()
+        available_beds = total_beds - occupied_beds
+
+        hostel_data.append({
+            'hostel': hostel,
+            'total_beds': total_beds,
+            'occupied': occupied_beds,
+            'available': available_beds
+        })
+
+    if request.method == 'POST':
+        hostel_id = request.POST.get('hostel_id')
+        selected_hostel = get_object_or_404(Hostel, id=hostel_id)
+
+        # Check availability again (IMPORTANT)
+        beds = Bed.objects.filter(room__hostel=selected_hostel)
+        if beds.filter(is_occupied=False).count() == 0:
+            messages.error(request, "Hostel is Full")
+            return redirect('view_applications')
+
+        # APPROVE
+        application.status = 'APPROVED'
+        application.assigned_hostel = selected_hostel
+        application.save()
+
+        # Update student profile
+        profile = application.student
+        profile.hostel = selected_hostel
+        profile.save()
+
+        messages.success(request, "Application Approved & Hostel Assigned")
+        return redirect('view_applications')
+
+    return render(request, 'monitor/approve_application.html', {
+        'application': application,
+        'hostel_data': hostel_data
+    })
+    
+    
+# >>>>> REJECT APPLICATIONS <<<<<
+
+@login_required
+def reject_application(request, id):
+    if request.user.role != 'MONITOR':
+        return redirect('login')
+
+    application = get_object_or_404(StudentApplication, id=id)
+
+    application.status = 'REJECTED'
+    application.save()
+
+    messages.error(request, "Application Rejected")
+    return redirect('view_applications')
+
+
+# >>>>>>
 # ---------------- DASHBOARDS ----------------
 
 @login_required
@@ -282,8 +417,6 @@ def create_warden(request):
     return render(request, 'admin/create_warden.html', {'form': user_form})
 
 
-
-
 # ---------------------ASSIGN WARDEN TO HOSTEL-----------------------------
 
 @login_required
@@ -357,156 +490,3 @@ def delete_warden(request, id):
     warden.delete()
 
     return redirect('view_wardens')
-
-
-# ---------------- STUDENT REGISTER ---------------------
-
-# def student_register(request):
-#     if request.method == 'POST':
-#         form = StudentRegisterForm(request.POST)
-
-#         if form.is_valid():
-#             # Create User
-#             user = User.objects.create_user(
-#                 username=form.cleaned_data['username'],
-#                 email=form.cleaned_data['email'],
-#                 password=form.cleaned_data['password'],
-#                 role='STUDENT'
-#             )
-
-#             # Create Student Profile
-#             profile = StudentProfile.objects.create(
-#                 user=user,
-#                 full_name=form.cleaned_data['full_name'],
-#                 dob=form.cleaned_data['dob'],
-#                 gender=form.cleaned_data['gender'],
-#                 address=form.cleaned_data['address'],
-#                 contact=form.cleaned_data['contact'],
-#                 course=form.cleaned_data['course'],
-#                 college_name=form.cleaned_data['college_name'],
-#                 college_year=form.cleaned_data['college_year']
-#             )
-
-#             # Create Hostel Application
-#             StudentApplication.objects.create(
-#                 student=profile,  # (make sure you updated model)
-#                 preferred_hostel=form.cleaned_data['preferred_hostel']
-#             )
-
-#             messages.success(request, "Registration successful! Please login.")
-#             return redirect('login')
-
-#     else:
-#         form = StudentRegisterForm()
-
-#     return render(request, 'student/register.html', {'form': form})
-
-
-# ---------------- VIEW HOSTELS (STUDENT) ----------------
-
-@login_required
-def student_view_hostels(request):
-    if request.user.role != 'STUDENT':
-        return redirect('login')
-
-    hostels = Hostel.objects.all()
-    return render(request, 'student/view_hostels.html', {'hostels': hostels})
-
-
-
-# ----------------------MONITOR DASHBOARD------------------------------------
-
-@login_required
-def monitor_dashboard(request):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    return render(request, 'monitor/dashboard.html')
-
-
-# ---------------------VIEW APPLICATION (MONITIR)--------------------------
-
-@login_required
-def view_applications(request):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    applications = StudentApplication.objects.filter(status='PENDING')
-    return render(request, 'monitor/view_applications.html', {'applications': applications})
-
-
-# ---------------------------APPROVE APPLICATION (MONITOR)---------------------------------
-
-
-@login_required
-def approve_application(request, id):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    application = get_object_or_404(StudentApplication, id=id)
-    hostels = Hostel.objects.all()
-    hostel_data = []
-
-    for hostel in hostels:
-        rooms = Room.objects.filter(hostel=hostel)
-
-        total_capacity = sum(room.capacity for room in rooms)
-        total_occupied = sum(room.occupied for room in rooms)
-        available = total_capacity - total_occupied
-
-        hostel_data.append({
-            'hostel': hostel,
-            'total_capacity': total_capacity,
-            'occupied': total_occupied,
-            'available': available
-        })
-
-    if request.method == 'POST':
-        hostel_id = request.POST.get('hostel_id')
-        selected_hostel = Hostel.objects.get(id=hostel_id)
-
-        # Update application
-        rooms = Room.objects.filter(hostel=selected_hostel)
-        total_capacity = sum(room.capacity for room in rooms)
-        total_occupied = sum(room.occupied for room in rooms)
-
-        if total_occupied >= total_capacity:
-            messages.error(request, "Hostel is Full")
-            return redirect('view_applications')
-
-        # approve after check
-        application.status = 'APPROVED'
-        application.assigned_hostel = selected_hostel
-        application.save()
-
-        profile = application.student
-        profile.is_approved = True
-        profile.hostel = selected_hostel
-        profile.save()
-
-        messages.success(request, "Hostel Assigned & Application Approved")
-        return redirect('view_applications')
-
-    return render(request, 'monitor/approve_application.html', {
-        'application': application,
-        'hostel_data': hostel_data
-
-    })
-
-
-# ----------------------REJECT APPLICATION (MONITOR)-------------------------------
-
-@login_required
-def reject_application(request, id):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    application = get_object_or_404(StudentApplication, id=id)
-    application.status = 'REJECTED'
-    application.save()
-
-    messages.error(request, "Application Rejected")
-    return redirect('view_applications')
-
-
-# -----------------------monitor assign room-------------------------------------
