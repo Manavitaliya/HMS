@@ -106,24 +106,29 @@ def student_dashboard(request):
 
     if not profile:
         return render(request, 'student/dashboard.html', {
-            'no_profile': True}, {'hostels': hostels})
+            'no_profile': True, 
+            'hostels': hostels
+        })
 
     application = StudentApplication.objects.filter(student=profile).last()
 
     if application.status == 'PENDING':
         return render(request, 'student/dashboard.html', {
-            'pending': True, 'hostels': hostels
+            'pending': True, 
+            'hostels': hostels
         })
 
     elif application.status == 'REJECTED':
         return render(request, 'student/dashboard.html', {
-            'rejected': True, 'hostels': hostels
+            'rejected': True, 
+            'hostels': hostels
         })
 
     elif application.status == 'APPROVED':
         return render(request, 'student/dashboard.html', {
             'approved': True,
-            'profile': profile, 'hostels': hostels
+            'profile': profile, 
+            'hostels': hostels
         })
 
 

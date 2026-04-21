@@ -1,187 +1,323 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <style>
-
-/* Layout */
-.dashboard-title {
-    font-weight: 700;
-    letter-spacing: 2px;
+body {
+    background: #f4f7fb;
+    font-family: 'DM Sans', sans-serif;
 }
 
-/* Cards */
+.dash-wrap {
+    padding: 30px;
+}
+
+/* Header */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.dash-title {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #cec75e, #3fbe2e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.live-pill {
+    background: #e6fffa;
+    color: #0f766e;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #0f766e;
+    border-radius: 50%;
+}
+
+/* Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
 .stat-card {
-    border-radius: 18px;
-    padding: 22px;
-    color: white;
-    transition: 0.25s;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
 .stat-card:hover {
     transform: translateY(-6px);
 }
 
-/* Soft gradients */
-.card-total { background: linear-gradient(135deg, #2c3e50, #4ca1af); }
-.card-pending { background: linear-gradient(135deg, #ffb347, #ffcc33); color:black;}
-.card-approved { background: linear-gradient(135deg, #00b09b, #96c93d); }
-.card-rejected { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-
-/* Glass effect */
-.glass-card {
-    border-radius: 18px;
-    background: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
 }
 
-/* Table */
-.table thead {
-    background: #f1f3f5;
+.t::before { background: linear-gradient(90deg,#5e60ce,#7b83ff); }
+.p::before { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+.a::before { background: linear-gradient(90deg,#10b981,#34d399); }
+.r::before { background: linear-gradient(90deg,#ef4444,#f87171); }
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
 }
 
-/* Filter */
-.filter-box select {
+.stat-label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* FILTER */
+
+.filter-bar {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* GRID SYSTEM */
+.filter-form {
+    display: grid;
+    grid-template-columns: 4fr 4fr 1fr 1fr; /* 40% 40% 10% 10% */
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+
+/* SELECT FULL WIDTH */
+.f-item select {
+    width: 100%;
+    padding: 10px 12px;
     border-radius: 10px;
-    padding: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 16px;
+    outline: none;
+    transition: 0.2s;
 }
 
-/* Buttons */
-.btn-custom {
-    border-radius: 8px;
-    padding: 6px 12px;
+.f-item select:focus {
+    border-color: #5e60ce;
+    box-shadow: 0 0 5px rgba(94,96,206,0.3);
 }
+
+/* BUTTONS FULL WIDTH */
+.btn-filter,
+.btn-reset {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+/* APPLY BUTTON */
+.btn-filter {
+    background: linear-gradient(135deg, #5e60ce, #7b83ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* RESET BUTTON */
+.btn-reset {
+    background: #f1f5f9;
+    color: #374151;
+    text-decoration: none;
+}
+
+/* HOVER */
+.btn-filter:hover {
+    box-shadow: 0 6px 15px rgba(94,96,206,0.3);
+}
+
+.btn-reset:hover {
+    background: #e2e8f0;
+}
+
+/* TABLE */
+.table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.table-head-row {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 14px 20px;
+}
+
+th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    text-align: left;
+    font-size: 18px;
+}
+
+tr {
+    transition: 0.2s;
+    font-size: 17px;
+}
+
+tr:hover {
+    background: #eef2ff;
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+/* BADGES */
+.badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.pending { background: #fff3cd; color: #856404; }
+.approved { background: #d1fae5; color: #065f46; }
+.rejected { background: #fde2e2; color: #7f1d1d; }
 
 </style>
 
-<div class="container">
+<div class="dash-wrap">
 
-    <!-- TITLE -->
-    <h2 class="text-center mb-5 dashboard-title">Monitor Dashboard</h2>
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="dash-title">Monitor Dashboard</div>
+        <div class="live-pill">
+            <span class="dot"></span> Live
+        </div>
+    </div>
 
-    <!-- STATS -->
-    <div class="row text-center mb-4">
-
-        <div class="col-md-3 mb-3">
-            <div class="stat-card card-total shadow">
-                <h6>Total Applications</h6>
-                <h2>{{ total }}</h2>
-            </div>
+    <!-- Stats -->
+    <div class="stats-grid" >
+        <div class="stat-card t">
+            <div class="stat-value">{{ total }}</div>
+            <div class="stat-label">Total Applications</div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card card-pending shadow">
-                <h6>Pending</h6>
-                <h2>{{ pending }}</h2>
-            </div>
+        <div class="stat-card p">
+            <div class="stat-value">{{ pending }}</div>
+            <div class="stat-label">Pending</div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card card-approved shadow">
-                <h6>Approved</h6>
-                <h2>{{ approved }}</h2>
-            </div>
+        <div class="stat-card a">
+            <div class="stat-value">{{ approved }}</div>
+            <div class="stat-label">Approved</div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card card-rejected shadow">
-                <h6>Rejected</h6>
-                <h2>{{ rejected }}</h2>
-            </div>
+        <div class="stat-card r">
+            <div class="stat-value">{{ rejected }}</div>
+            <div class="stat-label">Rejected</div>
         </div>
-
     </div>
 
     <!-- FILTER -->
-    <div class="glass-card p-3 mb-4">
-        <form method="GET">
-            <div class="row">
-                <div class="col-md-4">
-                    <select name="status" class="form-control">
-                        <option value="">All Status</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="REJECTED">Rejected</option>
-                    </select>
-                </div>
+    <div class="filter-bar">
+        <form method="GET" class="filter-form">
 
-                <div class="col-md-4">
-                    <select name="hostel" class="form-control">
-                        <option value="">All Hostels</option>
-                        {% for hostel in hostels %}
-                        <option value="{{ hostel.id }}">{{ hostel.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <button class="btn btn-dark w-100">Apply Filter</button>
-                </div>
+            <div class="f-item">
+                <select name="status">
+                    <option value="">All Status</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                </select>
             </div>
+
+            <div class="f-item">
+                <select name="hostel">
+                    <option value="">All Hostels</option>
+                    {% for hostel in hostels %}
+                        <option value="{{ hostel.id }}">{{ hostel.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-filter">Apply</button>
+            <a href="{% url 'monitor_dashboard' %}" class="btn-reset">Reset</a>
+
         </form>
     </div>
 
     <!-- TABLE -->
-    <div class="glass-card p-3">
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5>Applications</h5>
-
-            <a href="{% url 'view_applications' %}" class="btn btn-outline-dark btn-sm">
-                View All
-            </a>
+    <div class="table-card">
+        <div class="table-head-row">
+            Applications
         </div>
 
-        <table class="table table-hover align-middle">
-
+        <table>
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Student</th>
                     <th>Preferred Hostel</th>
                     <th>Status</th>
-                    <th class="text-end">Action</th>
                 </tr>
             </thead>
 
             <tbody>
-
                 {% for app in applications %}
                 <tr>
                     <td>{{ app.student.full_name }}</td>
                     <td>{{ app.preferred_hostel.name }}</td>
 
                     <td>
-                        <span class="badge 
-                            {% if app.status == 'PENDING' %} bg-warning
-                            {% elif app.status == 'APPROVED' %} bg-success
-                            {% else %} bg-danger {% endif %}">
-                            {{ app.status }}
-                        </span>
-                    </td>
-
-                    <td class="text-end">
-                        {% if app.status == 'PENDING' %}
-                        <a href="{% url 'approve_application' app.id %}" class="btn btn-success btn-sm btn-custom">
-                            Approve
-                        </a>
-
-                        <a href="{% url 'reject_application' app.id %}" class="btn btn-danger btn-sm btn-custom">
-                            Reject
-                        </a>
+                        {% if app.status == "PENDING" %}
+                            <span class="badge pending">Pending</span>
+                        {% elif app.status == "APPROVED" %}
+                            <span class="badge approved">Approved</span>
+                        {% else %}
+                            <span class="badge rejected">Rejected</span>
                         {% endif %}
                     </td>
                 </tr>
-
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center">No applications found</td>
+                    <td colspan="3" style="text-align:center; padding:20px;">
+                        No Applications Found
+                    </td>
                 </tr>
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
 
 </div>
