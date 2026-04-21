@@ -1,0 +1,45 @@
+<h5>{{ app.student.full_name }}</h5>
+
+<p><b>Course:</b> {{ app.student.course }}</p>
+<p><b>College:</b> {{ app.student.college_name }}</p>
+<p><b>Contact:</b> {{ app.student.contact }}</p>
+
+<p><b>Preferred Hostel:</b> {{ app.preferred_hostel.name }}</p>
+
+<hr>
+
+{% if available %}
+
+<p class="text-success">Beds Available ✅</p>
+
+<form method="POST" action="{% url 'approve_application' app.id %}">
+    {% csrf_token %}
+    <button class="btn btn-success">Approve</button>
+</form>
+
+{% else %}
+
+<p class="text-danger">No Beds Available ❌</p>
+
+<form method="POST" action="{% url 'approve_application' app.id %}">
+    {% csrf_token %}
+
+    <label>Select Another Hostel</label>
+    <select name="hostel" class="form-control mb-2">
+        {% for h in app.preferred_hostel.__class__.objects.all %}
+            <option value="{{ h.id }}">{{ h.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-warning">Approve with Override</button>
+</form>
+
+<hr>
+
+<form method="POST" action="{% url 'reject_application' app.id %}">
+    {% csrf_token %}
+    <textarea name="reason" placeholder="Reject reason" class="form-control"></textarea>
+    <button class="btn btn-danger mt-2">Reject</button>
+</form>
+
+{% endif %}

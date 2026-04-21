@@ -1,27 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Applications ({{ status }})</h2>
+<div class="container mt-4">
 
-<table class="table">
-<tr>
-    <th>Name</th>
-    <th>Hostel</th>
-    <th>Status</th>
-    <th>Action</th>
-</tr>
+<h3>Applications</h3>
 
-{% for app in applications %}
-<tr>
-    <td>{{ app.student.full_name }}</td>
-    <td>{{ app.preferred_hostel.name }}</td>
-    <td>{{ app.status }}</td>
+<!-- FILTER -->
+<div class="mb-3">
+    <a href="?status=" class="btn btn-secondary">All</a>
+    <a href="?status=PENDING" class="btn btn-warning">Pending</a>
+    <a href="?status=APPROVED" class="btn btn-success">Approved</a>
+    <a href="?status=REJECTED" class="btn btn-danger">Rejected</a>
+</div>
 
-    <td>
-        <button onclick="openModal({{ app.id }})">Show Details</button>
-    </td>
-</tr>
-{% endfor %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Hostel</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>{{ app.student.full_name }}</td>
+            <td>{{ app.preferred_hostel.name }}</td>
+            <td>{{ app.status }}</td>
+            <td>
+                <button class="btn btn-primary btn-sm"
+                        onclick="openModal({{ app.id }})">
+                    Show Details
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+
+<div style="background:white; width:60%; margin:5% auto; padding:20px; border-radius:10px;">
+
+    <h4>Student Details</h4>
+
+    <div id="modalContent"></div>
+
+    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+
+</div>
+</div>
+
+<script>
+
+function openModal(appId) {
+
+    fetch(`/monitor/check-availability/${appId}/`)
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("modalContent").innerHTML = data;
+        document.getElementById("modalBox").style.display = "block";
+    });
+
+}
+
+function closeModal(){
+    document.getElementById("modalBox").style.display = "none";
+}
+
+</script>
 
 {% endblock %}

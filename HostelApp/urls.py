@@ -28,17 +28,17 @@ urlpatterns = [
 
     # Monitor
     path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
-    path('monitor/applications/', views.view_applications, name='view_applications'),
     
-    path('monitor/applications/', views.all_applications, name='all_applications'),
-    path('monitor/applications/<str:status>/', views.filtered_applications, name='filtered_applications'),
+    # urls.py
 
-    # Application detail
-    path('monitor/application/<int:id>/', views.application_detail, name='application_detail'),
+path('monitor/applications/', views.view_applications, name='view_applications'),
 
+path('monitor/check-availability/<int:app_id>/', views.check_availability, name='check_availability'),
 
-    path('monitor/approve/<int:id>/', views.approve_application, name='approve_application'),
-    path('monitor/reject/<int:id>/', views.reject_application, name='reject_application'),
+path('monitor/approve/<int:app_id>/', views.approve_application, name='approve_application'),
+
+path('monitor/reject/<int:app_id>/', views.reject_application, name='reject_application'),
+    
 
     # Warden
     path('warden/dashboard/', views.warden_dashboard, name='warden_dashboard'),

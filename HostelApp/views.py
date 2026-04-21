@@ -251,21 +251,85 @@ def monitor_dashboard(request):
 
 # >>>>> VIEW APPLICATIONS <<<<<
 
-@login_required
+# VIEW APPLICATION (FILTER BASED)
 def view_applications(request):
     status = request.GET.get('status')
 
-    applications = StudentApplication.objects.select_related(
+    applications = StudentApplication.objects.all().select_related(
         'student', 'preferred_hostel'
-    )
+    ).order_by('-applied_at')
 
-    if status and status != "ALL":
+    if status:
         applications = applications.filter(status=status)
+
+    hostels = Hostel.objects.all()
 
     return render(request, 'monitor/view_applications.html', {
         'applications': applications,
-        'status': status
+        'hostels': hostels,
+        'selected_status': status
     })
+
+
+# CHECK BED AVAILABILITY
+def check_availability(request, app_id):
+    app = get_object_or_404(StudentApplication, id=app_id)
+
+    beds = Bed.objects.filter(
+        room__hostel=app.preferred_hostel,
+        is_occupied=False
+    )
+
+    return render(request, 'monitor/availability_result.html', {
+        'app': app,
+        'available': beds.exists()
+    })
+
+
+# APPROVE
+def approve_application(request, app_id):
+    app = get_object_or_404(StudentApplication, id=app_id)
+
+    hostel_id = request.POST.get('hostel')
+
+    if hostel_id:
+        hostel = Hostel.objects.get(id=hostel_id)
+    else:
+        hostel = app.preferred_hostel
+
+    bed = Bed.objects.filter(
+        room__hostel=hostel,
+        is_occupied=False
+    ).first()
+
+    if bed:
+        bed.is_occupied = True
+        bed.save()
+
+        profile = app.student
+        profile.hostel = hostel
+        profile.room = bed.room
+        profile.bed = bed
+        profile.save()
+
+        app.status = 'APPROVED'
+        app.assigned_hostel = hostel
+        app.save()
+
+    return redirect('view_applications')
+
+
+# REJECT
+def reject_application(request, app_id):
+    app = get_object_or_404(StudentApplication, id=app_id)
+
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+
+        app.status = 'REJECTED'
+        app.save()
+
+    return redirect('view_applications')
     
 
 # >>>>> ALL APPLICATIONs <<<<<

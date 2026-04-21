@@ -231,22 +231,22 @@ tr:hover {
 
     <!-- Stats -->
     <div class="stats-grid" >
-        <div class="stat-card t" onclick="window.location.href='{% url 'all_applications' %}'">
+        <div class="stat-card t" onclick="window.location.href='{% url 'view_applications' %}'">
             <div class="stat-value">{{ total }}</div>
             <div class="stat-label">Total Applications</div>
         </div>
 
-        <div class="stat-card p" onclick="window.location.href='{% url 'filtered_applications' 'PENDING' %}'">
+        {% comment %} <div class="stat-card p" onclick="window.location.href='{% url '#' 'PENDING' %}'"> {% endcomment %}
             <div class="stat-value">{{ pending }}</div>
             <div class="stat-label">Pending</div>
         </div>
 
-        <div class="stat-card a" onclick="window.location.href='{% url 'filtered_applications' 'APPROVED' %}'">
+        {% comment %} <div class="stat-card a" onclick="window.location.href='{% url '#' 'APPROVED' %}'"> {% endcomment %}
             <div class="stat-value">{{ approved }}</div>
             <div class="stat-label">Approved</div>
         </div>
 
-        <div class="stat-card r" onclick="window.location.href='{% url 'filtered_applications' 'REJECTED' %}'">
+        {% comment %} <div class="stat-card r" onclick="window.location.href='{% url '#' 'REJECTED' %}'"> {% endcomment %}
             <div class="stat-value">{{ rejected }}</div>
             <div class="stat-label">Rejected</div>
         </div>
