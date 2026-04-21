@@ -209,7 +209,7 @@ tr:hover {
 .badge {
     padding: 5px 12px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 500;
 }
 
@@ -236,17 +236,17 @@ tr:hover {
             <div class="stat-label">Total Applications</div>
         </div>
 
-        {% comment %} <div class="stat-card p" onclick="window.location.href='{% url '#' 'PENDING' %}'"> {% endcomment %}
+        <div class="stat-card p" onclick="window.location.href='{% url 'view_applications' %}'">
             <div class="stat-value">{{ pending }}</div>
             <div class="stat-label">Pending</div>
         </div>
 
-        {% comment %} <div class="stat-card a" onclick="window.location.href='{% url '#' 'APPROVED' %}'"> {% endcomment %}
+        <div class="stat-card a" onclick="window.location.href='{% url 'view_applications'%}'">
             <div class="stat-value">{{ approved }}</div>
             <div class="stat-label">Approved</div>
         </div>
 
-        {% comment %} <div class="stat-card r" onclick="window.location.href='{% url '#' 'REJECTED' %}'"> {% endcomment %}
+        <div class="stat-card r" onclick="window.location.href='{% url 'view_applications'%}'">
             <div class="stat-value">{{ rejected }}</div>
             <div class="stat-label">Rejected</div>
         </div>
@@ -283,7 +283,7 @@ tr:hover {
     <!-- TABLE -->
     <div class="table-card">
         <div class="table-head-row">
-            Applications
+            Recent Applications
         </div>
 
         <table>

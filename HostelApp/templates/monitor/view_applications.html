@@ -1,34 +1,147 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4">
 
-<h3>Applications</h3>
+<style>
+    body {
+    background: #f4f7fb;
+    font-family: 'DM Sans', sans-serif;
+}
 
-<!-- FILTER -->
-<div class="mb-3">
-    <a href="?status=" class="btn btn-secondary">All</a>
-    <a href="?status=PENDING" class="btn btn-warning">Pending</a>
-    <a href="?status=APPROVED" class="btn btn-success">Approved</a>
-    <a href="?status=REJECTED" class="btn btn-danger">Rejected</a>
-</div>
+.dash-wrap {
+    padding: 30px;
+}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Student</th>
-            <th>Hostel</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+/* Header */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.dash-title {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #cec75e, #3fbe2e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.live-pill {
+    background: #e6fffa;
+    color: #0f766e;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #0f766e;
+    border-radius: 50%;
+}
+
+/* TABLE */
+.table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.table-head-row {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 14px 20px;
+}
+
+th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    text-align: left;
+    font-size: 18px;
+}
+
+tr {
+    transition: 0.2s;
+    font-size: 17px;
+}
+
+tr:hover {
+    background: #eef2ff;
+    transform: scale(1.01);
+    cursor: pointer;
+}
+
+/* BADGES */
+.badge {
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.pending { background: #fff3cd; color: #856404; }
+.approved { background: #d1fae5; color: #065f46; }
+.rejected { background: #fde2e2; color: #7f1d1d; }
+
+</style>
+
+
+<div class="dash-wrap">
+
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="dash-title">Monitor Dashboard</div>
+        <div class="live-pill">
+            <span class="dot"></span> Live
+        </div>
+    </div>
+
+
+<div class="table-card">
+        <div class="table-head-row">
+            Applications
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Preferred Hostel</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
     <tbody>
         {% for app in applications %}
         <tr>
             <td>{{ app.student.full_name }}</td>
             <td>{{ app.preferred_hostel.name }}</td>
-            <td>{{ app.status }}</td>
+            <td>{% if app.status == "PENDING" %}
+                            <span class="badge pending">Pending</span>
+                        {% elif app.status == "APPROVED" %}
+                            <span class="badge approved">Approved</span>
+                        {% else %}
+                            <span class="badge rejected">Rejected</span>
+                        {% endif %}</td>
             <td>
                 <button class="btn btn-primary btn-sm"
                         onclick="openModal({{ app.id }})">
