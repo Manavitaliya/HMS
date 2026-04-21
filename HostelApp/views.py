@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 # --------------------TRY VIEWS-------------------
 
 def check(request):
-    return render(request, 'student/dashboard.html')
+    return render(request, 'monitor/application_detail.html')
 
 # -----------------HOME --------------------
 
@@ -253,17 +253,30 @@ def monitor_dashboard(request):
 
 @login_required
 def view_applications(request):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
+    status = request.GET.get('status')
 
     applications = StudentApplication.objects.select_related(
         'student', 'preferred_hostel'
-    ).filter(status='PENDING').order_by('-applied_at')
+    )
+
+    if status and status != "ALL":
+        applications = applications.filter(status=status)
 
     return render(request, 'monitor/view_applications.html', {
-        'applications': applications
+        'applications': applications,
+        'status': status
     })
     
+
+# >>>>> ALL APPLICATIONs <<<<<
+
+@login_required
+def all_applications(request):
+    applications = StudentApplication.objects.select_related('student', 'preferred_hostel').all()
+
+    return render(request, 'monitor/all_applications.html', {
+        'applications': applications
+    })
     
 # >>>>> APPROVE APPLICATIONS <<<<<
 

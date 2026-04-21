@@ -29,6 +29,14 @@ urlpatterns = [
     # Monitor
     path('monitor/dashboard/', views.monitor_dashboard, name='monitor_dashboard'),
     path('monitor/applications/', views.view_applications, name='view_applications'),
+    
+    path('monitor/applications/', views.all_applications, name='all_applications'),
+    path('monitor/applications/<str:status>/', views.filtered_applications, name='filtered_applications'),
+
+    # Application detail
+    path('monitor/application/<int:id>/', views.application_detail, name='application_detail'),
+
+
     path('monitor/approve/<int:id>/', views.approve_application, name='approve_application'),
     path('monitor/reject/<int:id>/', views.reject_application, name='reject_application'),
 
