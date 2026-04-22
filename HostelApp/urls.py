@@ -31,13 +31,14 @@ urlpatterns = [
     
     # urls.py
 
-path('monitor/applications/', views.view_applications, name='view_applications'),
+    path('monitor/applications/', views.view_applications, name='view_applications'),
+    path('monitor/application/<int:app_id>/', views.application_detail_api),
 
-path('monitor/check-availability/<int:app_id>/', views.check_availability, name='check_availability'),
+    path('monitor/check-availability/<int:app_id>/', views.check_availability, name='check_availability'),
 
-path('monitor/approve/<int:app_id>/', views.approve_application, name='approve_application'),
+    path('monitor/approve/<int:app_id>/', views.approve_application, name='approve_application'),
 
-path('monitor/reject/<int:app_id>/', views.reject_application, name='reject_application'),
+    path('monitor/reject/<int:app_id>/', views.reject_application, name='reject_application'),
     
 
     # Warden

@@ -6,6 +6,7 @@ from .models import User
 from .models import *
 from .forms import *
 from django.contrib import messages
+from django.http import JsonResponse
 
 from django.shortcuts import get_object_or_404
 
@@ -251,7 +252,6 @@ def monitor_dashboard(request):
 
 # >>>>> VIEW APPLICATIONS <<<<<
 
-# VIEW APPLICATION (FILTER BASED)
 def view_applications(request):
     status = request.GET.get('status')
 
@@ -266,6 +266,30 @@ def view_applications(request):
         'applications': applications,
         'selected_status': status
     })
+
+# >>>>> MODAL APPLICATION DETAIL <<<<<
+
+def application_detail_api(request, app_id):
+    app = StudentApplication.objects.select_related(
+        'student', 'preferred_hostel'
+    ).get(id=app_id)
+
+    student = app.student
+
+    data = {
+        'id': app.id,
+        'name': student.full_name,
+        'gender': student.gender,
+        'dob': student.dob,
+        'contact': student.contact,
+        'address': student.address,
+        'course': student.course,
+        'college': student.college_name,
+        'year': student.college_year,
+        'hostel': app.preferred_hostel.name,
+    }
+
+    return JsonResponse(data)
 
 
 # CHECK BED AVAILABILITY

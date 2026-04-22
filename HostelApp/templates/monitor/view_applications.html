@@ -150,6 +150,105 @@ tr:hover {
     letter-spacing: 1.3px;
 }
 
+
+/* MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+}
+
+.modal-content {
+    width: 75%;
+    margin: 3% auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    animation: slide 0.3s ease;
+}
+
+@keyframes slide {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    letter-spacing: 1.2px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    
+}
+
+.btn-close {
+    background: #ef4444;
+    color: white;
+    border: none;
+    
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-close:hover {
+    background: #dc2626;
+}
+
+/* DETAILS GRID */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.detail-card {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.detail-card label {
+    font-size: 15px;
+    letter-spacing: 1.2px;
+    color: #6b7280;
+}
+
+.detail-card p {
+    font-weight: 400;
+    margin-top: 3px;
+    letter-spacing: 1.1px;
+}
+
+/* ACTION AREA */
+.action-box {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.btn-main {
+    background: #5e60ce;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-main:hover {
+    background: #4b4ed8;
+}
+
 </style>
 
 
@@ -231,36 +330,93 @@ tr:hover {
 </div>
 
 <!-- MODAL -->
-<div id="modalBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+<div id="appModal" class="modal">
+    <div class="modal-content">
 
-<div style="background:white; width:60%; margin:5% auto; padding:20px; border-radius:10px;">
+        <div class="modal-header">
+            <h3>Application Details</h3>
+            <span class="btn-close" onclick="closeModal()">Close</span>
+        </div>
 
-    <h4>Student Details</h4>
+        <div id="modal-body">
+            <!-- dynamic data will come here -->
+        </div>
 
-    <div id="modalContent"></div>
-
-    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-
-</div>
+    </div>
 </div>
 
 <script>
-
 function openModal(appId) {
+    document.getElementById("appModal").style.display = "block";
 
-    fetch(`/monitor/check-availability/${appId}/`)
-    .then(res => res.text())
+    fetch(`/monitor/application/${appId}/`)
+    .then(res => res.json())
     .then(data => {
-        document.getElementById("modalContent").innerHTML = data;
-        document.getElementById("modalBox").style.display = "block";
+
+        document.getElementById("modal-body").innerHTML = `
+            <div class="details-grid">
+
+                <div class="detail-card">
+                    <label>Full Name</label>
+                    <p>${data.name}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Gender</label>
+                    <p>${data.gender}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Date of Birth</label>
+                    <p>${data.dob}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Contact</label>
+                    <p>${data.contact}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Address</label>
+                    <p>${data.address}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Course</label>
+                    <p>${data.course}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>College</label>
+                    <p>${data.college}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Year</label>
+                    <p>${data.year}</p>
+                </div>
+
+                <div class="detail-card">
+                    <label>Preferred Hostel</label>
+                    <p>${data.hostel}</p>
+                </div>
+
+            </div>
+
+            <div class="action-box">
+                <button onclick="checkAvailability(${data.id})" class="btn-main">
+                    Check Bed Availability
+                </button>
+
+                <div id="availability-result" style="margin-top:10px;"></div>
+            </div>
+        `;
     });
-
 }
 
-function closeModal(){
-    document.getElementById("modalBox").style.display = "none";
+function closeModal() {
+    document.getElementById("appModal").style.display = "none";
 }
-
 </script>
 
 {% endblock %}
