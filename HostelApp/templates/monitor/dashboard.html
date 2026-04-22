@@ -124,6 +124,7 @@ body {
     font-size: 16px;
     outline: none;
     transition: 0.2s;
+    letter-spacing: 1.2px;
 }
 
 .f-item select:focus {
@@ -172,7 +173,9 @@ body {
     background: white;
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-    overflow: hidden;
+    max-height: 245px;   /* height control */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .table-head-row {
@@ -195,7 +198,6 @@ th, td {
 th {
     background: #f8fafc;
     color: #64748b;
-    font-size: 12px;
     text-align: left;
     font-size: 18px;
     letter-spacing :1.6px;
@@ -245,17 +247,17 @@ tr:hover {
             <div class="stat-label">Total Applications</div>
         </div>
 
-        <div class="stat-card p" onclick="window.location.href='{% url 'view_applications' %}'">
+        <div class="stat-card p" onclick="window.location.href='{% url 'view_applications' %}?status=PENDING'">
             <div class="stat-value">{{ pending }}</div>
             <div class="stat-label">Pending</div>
         </div>
 
-        <div class="stat-card a" onclick="window.location.href='{% url 'view_applications'%}'">
+        <div class="stat-card a" onclick="window.location.href='{% url 'view_applications'%}?status=APPROVED'">
             <div class="stat-value">{{ approved }}</div>
             <div class="stat-label">Approved</div>
         </div>
 
-        <div class="stat-card r" onclick="window.location.href='{% url 'view_applications'%}'">
+        <div class="stat-card r" onclick="window.location.href='{% url 'view_applications'%}?status=REJECTED'">
             <div class="stat-value">{{ rejected }}</div>
             <div class="stat-label">Rejected</div>
         </div>

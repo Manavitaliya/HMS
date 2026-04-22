@@ -259,14 +259,11 @@ def view_applications(request):
         'student', 'preferred_hostel'
     ).order_by('-applied_at')
 
-    if status:
+    if status and status != "":
         applications = applications.filter(status=status)
-
-    hostels = Hostel.objects.all()
 
     return render(request, 'monitor/view_applications.html', {
         'applications': applications,
-        'hostels': hostels,
         'selected_status': status
     })
 
