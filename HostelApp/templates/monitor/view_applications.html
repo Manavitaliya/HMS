@@ -192,15 +192,15 @@ tr:hover {
 
 .btn-close {
 
-    color: white;
+    padding: 8px 18px;
+    border-radius: 5px;
     border: none;
-    width: 20px;
-    border-radius: 8px;
-    cursor: pointer;
+   
 }
 
 .btn-close:hover {
     background: #dc2626;
+    color: black;
 }
 
 /* DETAILS GRID */
@@ -335,7 +335,7 @@ tr:hover {
 
         <div class="modal-header">
             <h3>Application Details</h3>
-            <span class="btn-close" onclick="closeModal()">Close</span>
+            <span class="btn-close" onclick="closeModal()"></span>
         </div>
 
         <div id="modal-body">
@@ -346,8 +346,14 @@ tr:hover {
 </div>
 
 <script>
+
+// OPEN MODAL
 function openModal(appId) {
+
     document.getElementById("appModal").style.display = "block";
+
+    // loading state
+    document.getElementById("modal-body").innerHTML = "Loading...";
 
     fetch(`/monitor/application/${appId}/`)
     .then(res => res.json())
@@ -356,50 +362,15 @@ function openModal(appId) {
         document.getElementById("modal-body").innerHTML = `
             <div class="details-grid">
 
-                <div class="detail-card">
-                    <label>Full Name</label>
-                    <p>${data.name}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Gender</label>
-                    <p>${data.gender}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Date of Birth</label>
-                    <p>${data.dob}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Contact</label>
-                    <p>${data.contact}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Address</label>
-                    <p>${data.address}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Course</label>
-                    <p>${data.course}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>College</label>
-                    <p>${data.college}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Year</label>
-                    <p>${data.year}</p>
-                </div>
-
-                <div class="detail-card">
-                    <label>Preferred Hostel</label>
-                    <p>${data.hostel}</p>
-                </div>
+                <div class="detail-card"><label>Full Name</label><p>${data.name}</p></div>
+                <div class="detail-card"><label>Gender</label><p>${data.gender}</p></div>
+                <div class="detail-card"><label>DOB</label><p>${data.dob}</p></div>
+                <div class="detail-card"><label>Contact</label><p>${data.contact}</p></div>
+                <div class="detail-card"><label>Address</label><p>${data.address}</p></div>
+                <div class="detail-card"><label>Course</label><p>${data.course}</p></div>
+                <div class="detail-card"><label>College</label><p>${data.college}</p></div>
+                <div class="detail-card"><label>Year</label><p>${data.year}</p></div>
+                <div class="detail-card"><label>Preferred Hostel</label><p>${data.hostel}</p></div>
 
             </div>
 
@@ -411,12 +382,123 @@ function openModal(appId) {
                 <div id="availability-result" style="margin-top:10px;"></div>
             </div>
         `;
+    })
+    .catch(() => {
+        document.getElementById("modal-body").innerHTML = "Error loading data";
     });
 }
 
+
+// CHECK AVAILABILITY
+function checkAvailability(appId) {
+
+    document.getElementById("availability-result").innerHTML = "Checking...";
+
+    fetch(`/monitor/check-availability/${appId}/`)
+    .then(res => res.json())
+    .then(data => {
+
+        let html = "";
+
+        if (data.available > 0) {
+
+            html = `
+                <div style="color:green; font-weight:600;">
+                    ✅ ${data.available} Beds Available in ${data.hostel}
+                </div>
+
+                <button onclick="approveApp(${appId})" class="btn-approve">
+                    Approve Hostel
+                </button>
+            `;
+
+        } else {
+
+            html = `
+                <div style="color:red; font-weight:600;">
+                    ❌ No Beds Available in ${data.hostel}
+                </div>
+
+                <div style="margin-top:10px;">
+                    <label>Assign Other Hostel</label>
+                    <select id="overrideHostel" style="width:100%; padding:8px;">
+                        ${hostelOptions}
+                    </select>
+                </div>
+
+                <button onclick="approveOther(${appId})" class="btn-approve" style="margin-top:10px;">
+                    Assign & Approve
+                </button>
+
+                <div style="margin-top:10px;">
+                    <input type="text" id="rejectReason" placeholder="Enter rejection reason"
+                        style="width:100%; padding:8px;">
+                </div>
+
+                <button onclick="rejectApp(${appId})" class="btn-reject" style="margin-top:10px;">
+                    Reject Application
+                </button>
+            `;
+        }
+
+        document.getElementById("availability-result").innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById("availability-result").innerHTML = "Error checking availability";
+    });
+}
+
+
+// ✅ APPROVE (preferred hostel)
+function approveApp(appId) {
+
+    fetch(`/monitor/approve/${appId}/`)
+    .then(res => res.json())
+    .then(() => {
+        alert("Application Approved ✅");
+        location.reload();
+    });
+}
+
+
+// 🔁 APPROVE OTHER HOSTEL
+function approveOther(appId) {
+
+    let hostel_id = document.getElementById("overrideHostel").value;
+
+    fetch(`/monitor/approve-other/${appId}/?hostel_id=${hostel_id}`)
+    .then(res => res.json())
+    .then(() => {
+        alert("Assigned & Approved ✅");
+        location.reload();
+    });
+}
+
+
+// ❌ REJECT
+function rejectApp(appId) {
+
+    let reason = document.getElementById("rejectReason").value;
+
+    if (!reason) {
+        alert("Please enter rejection reason");
+        return;
+    }
+
+    fetch(`/monitor/reject/${appId}/?reason=${reason}`)
+    .then(res => res.json())
+    .then(() => {
+        alert("Application Rejected ❌");
+        location.reload();
+    });
+}
+
+
+// CLOSE MODAL
 function closeModal() {
     document.getElementById("appModal").style.display = "none";
 }
+
 </script>
 
 {% endblock %}

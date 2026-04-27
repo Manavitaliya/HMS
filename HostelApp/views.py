@@ -292,65 +292,71 @@ def application_detail_api(request, app_id):
     return JsonResponse(data)
 
 
-# CHECK BED AVAILABILITY
+# >>>>> CHECK BED AVAILABILITY <<<<<
+
 def check_availability(request, app_id):
-    app = get_object_or_404(StudentApplication, id=app_id)
+    app = StudentApplication.objects.select_related('preferred_hostel').get(id=app_id)
+    hostel = app.preferred_hostel
 
-    beds = Bed.objects.filter(
-        room__hostel=app.preferred_hostel,
-        is_occupied=False
-    )
-
-    return render(request, 'monitor/availability_result.html', {
-        'app': app,
-        'available': beds.exists()
-    })
-
-
-# APPROVE
-def approve_application(request, app_id):
-    app = get_object_or_404(StudentApplication, id=app_id)
-
-    hostel_id = request.POST.get('hostel')
-
-    if hostel_id:
-        hostel = Hostel.objects.get(id=hostel_id)
-    else:
-        hostel = app.preferred_hostel
-
-    bed = Bed.objects.filter(
+    # 1. Free beds (actual)
+    free_beds = Bed.objects.filter(
         room__hostel=hostel,
         is_occupied=False
-    ).first()
+    ).count()
 
-    if bed:
-        bed.is_occupied = True
-        bed.save()
+    # 2. Reserved beds (approved but not allocated)
+    reserved = StudentApplication.objects.filter(
+        assigned_hostel=hostel,
+        status='APPROVED'
+    ).count()
 
-        profile = app.student
-        profile.hostel = hostel
-        profile.room = bed.room
-        profile.bed = bed
-        profile.save()
+    # 3. Final availability
+    available = free_beds - reserved
 
-        app.status = 'APPROVED'
-        app.assigned_hostel = hostel
-        app.save()
+    data = {
+        "available": available,
+        "hostel": hostel.name
+    }
 
-    return redirect('view_applications')
+    return JsonResponse(data)
 
 
-# REJECT
+# >>>>> APPROVE APPLICATIONS <<<<<
+
+
+def approve_application(request, app_id):
+    app = StudentApplication.objects.get(id=app_id)
+
+    # assign hostel only
+    app.assigned_hostel = app.preferred_hostel
+    app.status = 'APPROVED'
+    app.save()
+
+    return JsonResponse({"success": True})
+
+# >>>>> OVERRIDE HOSTEL APPLICATION <<<<<
+
+def approve_other_hostel(request, app_id):
+    hostel_id = request.GET.get("hostel_id")
+
+    app = StudentApplication.objects.get(id=app_id)
+    app.assigned_hostel_id = hostel_id
+    app.status = 'APPROVED'
+    app.save()
+
+    return JsonResponse({"success": True})
+
+# >>>>> REJECT APPLICATIONS <<<<<
+
 def reject_application(request, app_id):
-    app = get_object_or_404(StudentApplication, id=app_id)
+    reason = request.GET.get("reason")
 
-    if request.method == 'POST':
-        reason = request.POST.get('reason')
+    app = StudentApplication.objects.get(id=app_id)
+    app.status = 'REJECTED'
+    app.rejection_reason = reason
+    app.save()
 
-        app.status = 'REJECTED'
-        app.save()
-
-    return redirect('view_applications')
+    return JsonResponse({"success": True})
     
 
 # >>>>> ALL APPLICATIONs <<<<<
