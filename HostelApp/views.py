@@ -298,37 +298,39 @@ def check_availability(request, app_id):
     app = StudentApplication.objects.select_related('preferred_hostel').get(id=app_id)
     hostel = app.preferred_hostel
 
-    # 1. Free beds (actual)
-    free_beds = Bed.objects.filter(
+    available = Bed.objects.filter(
         room__hostel=hostel,
         is_occupied=False
     ).count()
 
-    # 2. Reserved beds (approved but not allocated)
-    reserved = StudentApplication.objects.filter(
-        assigned_hostel=hostel,
-        status='APPROVED'
-    ).count()
-
-    # 3. Final availability
-    available = free_beds - reserved
-
-    data = {
+    return JsonResponse({
         "available": available,
         "hostel": hostel.name
-    }
-
-    return JsonResponse(data)
+    })
 
 
 # >>>>> APPROVE APPLICATIONS <<<<<
 
-
 def approve_application(request, app_id):
     app = StudentApplication.objects.get(id=app_id)
 
-    # assign hostel only
-    app.assigned_hostel = app.preferred_hostel
+    hostel = app.preferred_hostel
+
+    # get free bed
+    bed = Bed.objects.filter(
+        room__hostel=hostel,
+        is_occupied=False
+    ).first()
+
+    if not bed:
+        return JsonResponse({"success": False, "message": "No beds available"})
+
+    # occupy bed
+    bed.is_occupied = True
+    bed.save()
+
+    # assign hostel
+    app.assigned_hostel = hostel
     app.status = 'APPROVED'
     app.save()
 
@@ -340,6 +342,18 @@ def approve_other_hostel(request, app_id):
     hostel_id = request.GET.get("hostel_id")
 
     app = StudentApplication.objects.get(id=app_id)
+
+    bed = Bed.objects.filter(
+        room__hostel_id=hostel_id,
+        is_occupied=False
+    ).first()
+
+    if not bed:
+        return JsonResponse({"success": False, "message": "No beds in selected hostel"})
+
+    bed.is_occupied = True
+    bed.save()
+
     app.assigned_hostel_id = hostel_id
     app.status = 'APPROVED'
     app.save()
@@ -349,7 +363,7 @@ def approve_other_hostel(request, app_id):
 # >>>>> REJECT APPLICATIONS <<<<<
 
 def reject_application(request, app_id):
-    reason = request.GET.get("reason")
+    reason = request.GET.get("reason", "")
 
     app = StudentApplication.objects.get(id=app_id)
     app.status = 'REJECTED'
@@ -369,80 +383,7 @@ def all_applications(request):
         'applications': applications
     })
     
-# >>>>> APPROVE APPLICATIONS <<<<<
-
-@login_required
-def approve_application(request, id):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    application = get_object_or_404(StudentApplication, id=id)
-
-    hostels = Hostel.objects.all()
-
-    hostel_data = []
-
-    for hostel in hostels:
-        rooms = Room.objects.filter(hostel=hostel)
-        beds = Bed.objects.filter(room__hostel=hostel)
-
-        total_beds = beds.count()
-        occupied_beds = beds.filter(is_occupied=True).count()
-        available_beds = total_beds - occupied_beds
-
-        hostel_data.append({
-            'hostel': hostel,
-            'total_beds': total_beds,
-            'occupied': occupied_beds,
-            'available': available_beds
-        })
-
-    if request.method == 'POST':
-        hostel_id = request.POST.get('hostel_id')
-        selected_hostel = get_object_or_404(Hostel, id=hostel_id)
-
-        # Check availability again (IMPORTANT)
-        beds = Bed.objects.filter(room__hostel=selected_hostel)
-        if beds.filter(is_occupied=False).count() == 0:
-            messages.error(request, "Hostel is Full")
-            return redirect('view_applications')
-
-        # APPROVE
-        application.status = 'APPROVED'
-        application.assigned_hostel = selected_hostel
-        application.save()
-
-        # Update student profile
-        profile = application.student
-        profile.hostel = selected_hostel
-        profile.save()
-
-        messages.success(request, "Application Approved & Hostel Assigned")
-        return redirect('view_applications')
-
-    return render(request, 'monitor/approve_application.html', {
-        'application': application,
-        'hostel_data': hostel_data
-    })
     
-    
-# >>>>> REJECT APPLICATIONS <<<<<
-
-@login_required
-def reject_application(request, id):
-    if request.user.role != 'MONITOR':
-        return redirect('login')
-
-    application = get_object_or_404(StudentApplication, id=id)
-
-    application.status = 'REJECTED'
-    application.save()
-
-    messages.error(request, "Application Rejected")
-    return redirect('view_applications')
-
-
-# >>>>>>
 # ---------------- DASHBOARDS ----------------
 
 @login_required
