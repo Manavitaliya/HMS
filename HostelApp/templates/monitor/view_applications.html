@@ -359,6 +359,44 @@ function openModal(appId) {
     .then(res => res.json())
     .then(data => {
 
+
+        let actionSection = "";
+
+        // ✅ PENDING
+        if (data.status === "PENDING") {
+
+            actionSection = `
+                <div class="action-box">
+                    <button onclick="checkAvailability(${data.id})" class="btn-main">
+                        Check Bed Availability
+                    </button>
+
+                    <div id="availability-result" style="margin-top:10px;"></div>
+                </div>
+            `;
+        }
+
+        // ✅ APPROVED
+        else if (data.status === "APPROVED") {
+
+            actionSection = `
+                <div class="status-box success">
+                    ✅ Application Approved
+                </div>
+            `;
+        }
+
+        // ✅ REJECTED
+        else if (data.status === "REJECTED") {
+
+            actionSection = `
+                <div class="status-box reject">
+                    ❌ Application Rejected
+                    <br><small>Reason: ${data.reason || "Not provided"}</small>
+                </div>
+            `;
+        }
+
         document.getElementById("modal-body").innerHTML = `
             <div class="details-grid">
 
@@ -381,6 +419,8 @@ function openModal(appId) {
 
                 <div id="availability-result" style="margin-top:10px;"></div>
             </div>
+
+            ${actionSection}
         `;
     })
     .catch(() => {
