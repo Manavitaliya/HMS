@@ -359,11 +359,14 @@ function openModal(appId) {
     .then(res => res.json())
     .then(data => {
 
-
         let actionSection = "";
 
-        // ✅ PENDING
-        if (data.status === "PENDING") {
+        const status = data.status.trim().toUpperCase();
+
+        console.log(status);
+
+        // PENDING
+        if (status === "PENDING") {
 
             actionSection = `
                 <div class="action-box">
@@ -376,8 +379,8 @@ function openModal(appId) {
             `;
         }
 
-        // ✅ APPROVED
-        else if (data.status === "APPROVED") {
+        // APPROVED
+        else if (status === "APPROVED") {
 
             actionSection = `
                 <div class="status-box success">
@@ -386,8 +389,8 @@ function openModal(appId) {
             `;
         }
 
-        // ✅ REJECTED
-        else if (data.status === "REJECTED") {
+        // REJECTED
+        else if (status === "REJECTED") {
 
             actionSection = `
                 <div class="status-box reject">
@@ -412,18 +415,11 @@ function openModal(appId) {
 
             </div>
 
-            <div class="action-box">
-                <button onclick="checkAvailability(${data.id})" class="btn-main">
-                    Check Bed Availability
-                </button>
-
-                <div id="availability-result" style="margin-top:10px;"></div>
-            </div>
-
             ${actionSection}
         `;
     })
-    .catch(() => {
+    .catch((error) => {
+        console.log(error)
         document.getElementById("modal-body").innerHTML = "Error loading data";
     });
 }
