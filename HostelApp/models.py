@@ -143,6 +143,10 @@ class StudentApplication(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     applied_at = models.DateTimeField(auto_now_add=True)
+    
+    rejection_reason = models.TextField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True,null=True)
 
     def __str__(self):
         return f"{self.student.full_name} - {self.status}"
