@@ -270,9 +270,7 @@ def view_applications(request):
 # >>>>> MODAL APPLICATION DETAIL <<<<<
 
 def application_detail_api(request, app_id):
-    app = StudentApplication.objects.select_related(
-        'student', 'preferred_hostel'
-    ).get(id=app_id)
+    app = StudentApplication.objects.get(id=app_id)
 
     student = app.student
 
@@ -287,6 +285,9 @@ def application_detail_api(request, app_id):
         'college': student.college_name,
         'year': student.college_year,
         'hostel': app.preferred_hostel.name,
+        
+        "status": app.status,
+        # "reason": app.rejection_reason,
     }
 
     return JsonResponse(data)
