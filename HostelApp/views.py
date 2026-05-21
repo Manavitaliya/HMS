@@ -287,7 +287,7 @@ def application_detail_api(request, app_id):
         'hostel': app.preferred_hostel.name,
         
         "status": app.status,
-        # "reason": app.rejection_reason,
+        "reason": app.rejection_reason,
     }
 
     return JsonResponse(data)
