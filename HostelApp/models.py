@@ -140,6 +140,13 @@ class StudentApplication(models.Model):
         blank=True,
         related_name='assigned_students'
     )
+    
+    assigned_bed = models.ForeignKey(
+        Bed,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     applied_at = models.DateTimeField(auto_now_add=True)
